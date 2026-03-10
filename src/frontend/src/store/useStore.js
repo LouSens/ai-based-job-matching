@@ -81,11 +81,12 @@ const useStore = create((set, get) => ({
 
     setChatInput: (val) => set({ chatInput: val }),
 
-    sendMessage: async () => {
+    sendMessage: async (overrideMessage) => {
         const { chatInput, chatMessages, profile } = get()
-        if (!chatInput.trim()) return
+        const message = overrideMessage || chatInput
+        if (!message.trim()) return
 
-        const userMsg = { role: 'user', content: chatInput }
+        const userMsg = { role: 'user', content: message }
         set({
             chatMessages: [...chatMessages, userMsg],
             chatInput: '',
@@ -97,8 +98,8 @@ const useStore = create((set, get) => ({
                 ...profile,
                 skills: profile.skills.split(',').map((s) => s.trim()).filter(Boolean),
             }
-            const data = await getCareerAdvice(chatInput, seekerProfile, chatMessages)
-            const assistantMsg = { role: 'assistant', content: data.response }
+            const data = await getCareerAdvice(message, seekerProfile, chatMessages)
+            const assistantMsg = { role: 'assistant', content: data.response || data.response_text || 'Terima kasih atas pertanyaannya.' }
             set((s) => ({
                 chatMessages: [...s.chatMessages, assistantMsg],
                 chatLoading: false,

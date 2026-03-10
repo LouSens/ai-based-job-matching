@@ -7,7 +7,7 @@ import useStore from '../store/useStore'
  * Connected to: POST /api/v1/skill-gap
  */
 export default function SkillGapPanel() {
-    const { selectedJob, skillGap, skillGapLoading, profile } = useStore()
+    const { selectedJob, skillGap, skillGapLoading } = useStore()
 
     if (!selectedJob && !skillGap) {
         return (
@@ -38,9 +38,13 @@ export default function SkillGapPanel() {
     }
 
     const severity = severityConfig[skillGap?.gap_severity] || severityConfig.medium
-    const matchPercent = skillGap ? Math.round(
-        (skillGap.matching_skills?.length / (skillGap.matching_skills?.length + skillGap.missing_skills?.length || 1)) * 100
-    ) : 0
+    // Use match_percentage from API if available, otherwise calculate
+    const matchPercent = skillGap?.match_percentage ?? (
+        skillGap ? Math.round(
+            (skillGap.matching_skills?.length /
+                Math.max(skillGap.matching_skills?.length + skillGap.missing_skills?.length, 1)) * 100
+        ) : 0
+    )
 
     return (
         <div className="space-y-4 animate-fade-in">
@@ -51,18 +55,25 @@ export default function SkillGapPanel() {
                         <div className="w-10 h-10 rounded-xl bg-brand-500/20 flex items-center justify-center text-lg">🎯</div>
                         <div>
                             <h3 className="font-semibold text-sm">{selectedJob.title}</h3>
-                            <p className="text-xs text-surface-400">{selectedJob.company}</p>
+                            <p className="text-xs text-surface-400">{selectedJob.company} · {selectedJob.region_name || selectedJob.region_code}</p>
                         </div>
                     </div>
 
                     {/* Gap severity banner */}
                     <div className={`${severity.bg} border ${severity.border} rounded-xl px-4 py-3 flex items-center gap-3`}>
-                        <div className={`text-2xl font-bold ${severity.color}`}>{matchPercent}%</div>
+                        <div className={`text-2xl font-bold ${severity.color}`}>{Math.round(matchPercent)}%</div>
                         <div>
                             <div className={`text-sm font-medium ${severity.color}`}>{severity.label}</div>
                             <div className="text-[10px] text-surface-400">Skill match coverage</div>
                         </div>
                     </div>
+                </div>
+            )}
+
+            {/* Summary */}
+            {skillGap?.summary && (
+                <div className="glass-card p-4">
+                    <p className="text-sm text-surface-300 leading-relaxed">{skillGap.summary}</p>
                 </div>
             )}
 
@@ -114,14 +125,31 @@ export default function SkillGapPanel() {
             )}
 
             {/* Course recommendations */}
-            {skillGap?.recommendations && (
+            {skillGap?.recommended_courses && skillGap.recommended_courses.length > 0 && (
                 <div className="glass-card p-5">
                     <div className="flex items-center gap-2 mb-3">
                         <span>📚</span>
                         <h4 className="text-sm font-semibold">Rekomendasi Kursus</h4>
                     </div>
-                    <p className="text-xs text-surface-300 leading-relaxed whitespace-pre-line">
-                        {skillGap.recommendations}
+                    <div className="space-y-2">
+                        {skillGap.recommended_courses.map((course, i) => (
+                            <div key={i} className="flex items-center justify-between bg-white/[0.03] rounded-lg px-3 py-2.5 border border-white/[0.05]">
+                                <div>
+                                    <p className="text-xs font-medium text-surface-200">{course.name}</p>
+                                    <p className="text-[10px] text-surface-500">{course.provider}</p>
+                                </div>
+                                <span className="text-[10px] text-brand-400 font-medium whitespace-nowrap">{course.duration}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {/* Estimated readiness */}
+            {skillGap?.estimated_readiness_months > 0 && (
+                <div className="glass-card p-4 text-center">
+                    <p className="text-xs text-surface-400">
+                        ⏱ Estimasi waktu persiapan: <span className="text-brand-400 font-semibold">{skillGap.estimated_readiness_months} bulan</span>
                     </p>
                 </div>
             )}

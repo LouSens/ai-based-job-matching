@@ -81,16 +81,16 @@ export default function AdvisorChat() {
                     >
                         {/* Avatar */}
                         <div className={`w-7 h-7 rounded-lg shrink-0 flex items-center justify-center text-sm border border-white/[0.08] ${msg.role === 'user'
-                                ? 'bg-gradient-to-br from-brand-500/30 to-cyan-500/30'
-                                : 'bg-white/[0.04]'
+                            ? 'bg-gradient-to-br from-brand-500/30 to-cyan-500/30'
+                            : 'bg-white/[0.04]'
                             }`}>
                             {msg.role === 'user' ? '👤' : '🤖'}
                         </div>
 
                         {/* Bubble */}
                         <div className={`max-w-[80%] rounded-2xl px-4 py-3 text-[13px] leading-relaxed ${msg.role === 'user'
-                                ? 'bg-brand-500/15 border border-brand-500/20 rounded-tr-md'
-                                : 'bg-white/[0.04] border border-white/[0.08] rounded-tl-md'
+                            ? 'bg-brand-500/15 border border-brand-500/20 rounded-tr-md'
+                            : 'bg-white/[0.04] border border-white/[0.08] rounded-tl-md'
                             }`}>
                             {renderContent(msg.content)}
                         </div>
@@ -123,7 +123,7 @@ export default function AdvisorChat() {
                         {quickPrompts.map((prompt, i) => (
                             <button
                                 key={i}
-                                onClick={() => { setChatInput(prompt); sendMessage() }}
+                                onClick={() => sendMessage(prompt)}
                                 className="text-[11px] text-surface-300 bg-white/[0.04] border border-white/[0.08]
                            rounded-lg px-2.5 py-1.5 hover:bg-white/[0.08] hover:border-brand-500/30
                            transition-all duration-200"

@@ -67,6 +67,13 @@ class MatchResult(BaseModel):
     region_match: bool
     salary_in_range: bool
     explanation: str
+    required_skills: list[str] = []
+    region_code: str = ""
+    region_name: str = ""
+    salary_min: int = 0
+    salary_max: int = 0
+    education_min: str = "S1"
+    experience_years_min: int = 0
 
 
 class MatchResponse(BaseModel):
@@ -96,6 +103,34 @@ class AdvisorRequest(BaseModel):
     message: str
     seeker_profile: SeekerProfile
     conversation_history: list[ChatMessage] = []
+
+
+class CourseRecommendation(BaseModel):
+    """Recommended course from skill gap analysis."""
+    name: str
+    provider: str
+    duration: str
+
+
+class SkillGapResponse(BaseModel):
+    """Response from skill gap analysis endpoint."""
+    request_id: str
+    missing_skills: list[str]
+    matching_skills: list[str]
+    gap_severity: str
+    match_percentage: float
+    recommended_courses: list[CourseRecommendation]
+    estimated_readiness_months: int
+    confidence: float
+    summary: str
+
+
+class AdvisorResponse(BaseModel):
+    """Response from career advisor endpoint."""
+    request_id: str
+    response: str
+    agent: str
+    confidence: float
 
 
 # ─── Mock Data (Demo Mode) ────────────────────────────────────────────────────
@@ -256,6 +291,10 @@ async def match_jobs(request: MatchRequest):
     logger.info(f"Match request for seeker {request.seeker_profile.seeker_id}")
 
     # Demo mode: return mock jobs sorted by match score
+    region_names = {
+        "3171": "Jakarta Pusat", "3174": "Jakarta Selatan",
+        "3573": "Malang", "3578": "Surabaya",
+    }
     matches = [
         MatchResult(
             job_id=job["job_id"],
@@ -265,7 +304,14 @@ async def match_jobs(request: MatchRequest):
             skill_overlap=job["skill_overlap"],
             region_match=job["region_match"],
             salary_in_range=job["salary_in_range"],
-            explanation=job["explanation"]
+            explanation=job["explanation"],
+            required_skills=job.get("required_skills", []),
+            region_code=job.get("region_code", ""),
+            region_name=region_names.get(job.get("region_code", ""), job.get("region_code", "")),
+            salary_min=job.get("salary_min", 0),
+            salary_max=job.get("salary_max", 0),
+            education_min=job.get("education_min", "S1"),
+            experience_years_min=job.get("experience_years_min", 0),
         )
         for job in sorted(MOCK_JOBS, key=lambda x: x["match_score"], reverse=True)[:request.top_k]
     ]
@@ -282,7 +328,7 @@ async def match_jobs(request: MatchRequest):
 
 # ─── Skill Gap Endpoint ───────────────────────────────────────────────────────
 
-@app.post("/api/v1/skill-gap")
+@app.post("/api/v1/skill-gap", response_model=SkillGapResponse)
 async def analyze_skill_gap(request: SkillGapRequest):
     """
     Analyze skill gap between seeker's current skills and target job requirements.
@@ -323,7 +369,7 @@ async def analyze_skill_gap(request: SkillGapRequest):
 
 # ─── Career Advisor Endpoint ──────────────────────────────────────────────────
 
-@app.post("/api/v1/advisor")
+@app.post("/api/v1/advisor", response_model=AdvisorResponse)
 async def career_advisor(request: AdvisorRequest):
     """
     AI career advisor powered by Google Gemini.
