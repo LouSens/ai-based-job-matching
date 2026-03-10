@@ -344,7 +344,7 @@ export default function KerjaCerdas() {
                 <div style={{ maxWidth: 680, margin: "0 auto" }}>
                     <div style={{ marginBottom: "1rem" }}>
                         <h2 style={{ margin: 0, fontSize: "1.1rem" }}>🤖 Asisten Karier AI</h2>
-                        <p style={{ margin: "0.25rem 0 0", color: C.muted, fontSize: "0.78rem" }}>Powered by Claude · Bahasa Indonesia · Konteks pasar kerja Indonesia</p>
+                        <p style={{ margin: "0.25rem 0 0", color: C.muted, fontSize: "0.78rem" }}>Powered by Google Gemini · Bahasa Indonesia · Konteks pasar kerja Indonesia</p>
                     </div>
 
                     {/* Chat area */}

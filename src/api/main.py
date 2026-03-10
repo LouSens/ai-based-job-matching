@@ -14,7 +14,6 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
 logging.basicConfig(level=logging.INFO)
@@ -68,6 +67,13 @@ class MatchResult(BaseModel):
     region_match: bool
     salary_in_range: bool
     explanation: str
+    required_skills: list[str] = []
+    region_code: str = ""
+    region_name: str = ""
+    salary_min: int = 0
+    salary_max: int = 0
+    education_min: str = "S1"
+    experience_years_min: int = 0
 
 
 class MatchResponse(BaseModel):
@@ -97,6 +103,34 @@ class AdvisorRequest(BaseModel):
     message: str
     seeker_profile: SeekerProfile
     conversation_history: list[ChatMessage] = []
+
+
+class CourseRecommendation(BaseModel):
+    """Recommended course from skill gap analysis."""
+    name: str
+    provider: str
+    duration: str
+
+
+class SkillGapResponse(BaseModel):
+    """Response from skill gap analysis endpoint."""
+    request_id: str
+    missing_skills: list[str]
+    matching_skills: list[str]
+    gap_severity: str
+    match_percentage: float
+    recommended_courses: list[CourseRecommendation]
+    estimated_readiness_months: int
+    confidence: float
+    summary: str
+
+
+class AdvisorResponse(BaseModel):
+    """Response from career advisor endpoint."""
+    request_id: str
+    response: str
+    agent: str
+    confidence: float
 
 
 # ─── Mock Data (Demo Mode) ────────────────────────────────────────────────────
@@ -257,6 +291,10 @@ async def match_jobs(request: MatchRequest):
     logger.info(f"Match request for seeker {request.seeker_profile.seeker_id}")
 
     # Demo mode: return mock jobs sorted by match score
+    region_names = {
+        "3171": "Jakarta Pusat", "3174": "Jakarta Selatan",
+        "3573": "Malang", "3578": "Surabaya",
+    }
     matches = [
         MatchResult(
             job_id=job["job_id"],
@@ -266,7 +304,14 @@ async def match_jobs(request: MatchRequest):
             skill_overlap=job["skill_overlap"],
             region_match=job["region_match"],
             salary_in_range=job["salary_in_range"],
-            explanation=job["explanation"]
+            explanation=job["explanation"],
+            required_skills=job.get("required_skills", []),
+            region_code=job.get("region_code", ""),
+            region_name=region_names.get(job.get("region_code", ""), job.get("region_code", "")),
+            salary_min=job.get("salary_min", 0),
+            salary_max=job.get("salary_max", 0),
+            education_min=job.get("education_min", "S1"),
+            experience_years_min=job.get("experience_years_min", 0),
         )
         for job in sorted(MOCK_JOBS, key=lambda x: x["match_score"], reverse=True)[:request.top_k]
     ]
@@ -283,7 +328,7 @@ async def match_jobs(request: MatchRequest):
 
 # ─── Skill Gap Endpoint ───────────────────────────────────────────────────────
 
-@app.post("/api/v1/skill-gap")
+@app.post("/api/v1/skill-gap", response_model=SkillGapResponse)
 async def analyze_skill_gap(request: SkillGapRequest):
     """
     Analyze skill gap between seeker's current skills and target job requirements.
@@ -324,41 +369,30 @@ async def analyze_skill_gap(request: SkillGapRequest):
 
 # ─── Career Advisor Endpoint ──────────────────────────────────────────────────
 
-@app.post("/api/v1/advisor")
+@app.post("/api/v1/advisor", response_model=AdvisorResponse)
 async def career_advisor(request: AdvisorRequest):
     """
-    AI career advisor powered by Claude.
+    AI career advisor powered by Google Gemini.
     Provides personalized career guidance in Bahasa Indonesia.
     """
     try:
-        client = anthropic.Anthropic()
+        from src.agents.advisor_agent import AdvisorAgent, AdvisorContext
 
-        system = f"""Kamu adalah konselor karier berpengalaman untuk pasar kerja Indonesia.
-        
-Profil pengguna:
-- Nama: {request.seeker_profile.name}
-- Skills: {', '.join(request.seeker_profile.skills)}
-- Pengalaman: {request.seeker_profile.experience_years} tahun
-- Lokasi: {request.seeker_profile.region_code}
-
-Berikan saran yang personal, actionable, dan relevan dengan konteks pasar kerja Indonesia.
-Gunakan Bahasa Indonesia yang ramah dan profesional. Maksimum 3 paragraf."""
-
-        messages = [{"role": m.role, "content": m.content} for m in request.conversation_history]
-        messages.append({"role": "user", "content": request.message})
-
-        response = client.messages.create(
-            model="claude-sonnet-4-20250514",
-            max_tokens=500,
-            system=system,
-            messages=messages
+        advisor = AdvisorAgent(demo_mode=True)
+        context = AdvisorContext(
+            seeker_name=request.seeker_profile.name,
+            seeker_skills=request.seeker_profile.skills,
+            seeker_experience_years=request.seeker_profile.experience_years,
+            seeker_region=request.seeker_profile.region_code,
         )
 
+        result = await advisor.advise(request.message, context)
+
         return {
-            "request_id": str(uuid.uuid4()),
-            "response": response.content[0].text,
-            "agent": "advisor_agent",
-            "confidence": 0.88
+            "request_id": result.request_id,
+            "response": result.response_text,
+            "agent": result.agent,
+            "confidence": result.confidence,
         }
 
     except Exception as e:
