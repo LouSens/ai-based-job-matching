@@ -326,7 +326,7 @@ async def analyze_skill_gap(request: SkillGapRequest):
 @app.post("/api/v1/advisor")
 async def career_advisor(request: AdvisorRequest):
     """
-    AI career advisor powered by Claude.
+    AI career advisor powered by Google Gemini.
     Provides personalized career guidance in Bahasa Indonesia.
     """
     try:

@@ -1,4 +1,5 @@
-version: "3.9"
+# KerjaCerdas — Docker Compose Stack
+# Usage: docker-compose up (requires Docker Desktop running)
 
 services:
   api:
