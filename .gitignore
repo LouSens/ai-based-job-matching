@@ -1,2 +1,55 @@
+# ─── KerjaCerdas .gitignore ───────────────────────────────────────────────────
+
+# Environment & Secrets (RULE-01)
 .env
-.agents
+*.env.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# ML Models (NEVER commit model weights - PROTOCOL §6)
+models/*.pt
+models/*.onnx
+models/*.bin
+*.h5
+
+# Data (versioned via DVC, not git)
+data/raw/
+data/processed/
+data/features/
+data/seed/
+
+# Reports (generated output)
+reports/
+
+# MLflow
+mlruns/
+
+# Node (frontend)
+node_modules/
+.next/
+src/frontend/dist/
+
+# Docker
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Agents config (local)
+.agents/

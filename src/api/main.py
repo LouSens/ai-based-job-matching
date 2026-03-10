@@ -14,7 +14,6 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
 logging.basicConfig(level=logging.INFO)
@@ -331,34 +330,23 @@ async def career_advisor(request: AdvisorRequest):
     Provides personalized career guidance in Bahasa Indonesia.
     """
     try:
-        client = anthropic.Anthropic()
+        from src.agents.advisor_agent import AdvisorAgent, AdvisorContext
 
-        system = f"""Kamu adalah konselor karier berpengalaman untuk pasar kerja Indonesia.
-        
-Profil pengguna:
-- Nama: {request.seeker_profile.name}
-- Skills: {', '.join(request.seeker_profile.skills)}
-- Pengalaman: {request.seeker_profile.experience_years} tahun
-- Lokasi: {request.seeker_profile.region_code}
-
-Berikan saran yang personal, actionable, dan relevan dengan konteks pasar kerja Indonesia.
-Gunakan Bahasa Indonesia yang ramah dan profesional. Maksimum 3 paragraf."""
-
-        messages = [{"role": m.role, "content": m.content} for m in request.conversation_history]
-        messages.append({"role": "user", "content": request.message})
-
-        response = client.messages.create(
-            model="claude-sonnet-4-20250514",
-            max_tokens=500,
-            system=system,
-            messages=messages
+        advisor = AdvisorAgent(demo_mode=True)
+        context = AdvisorContext(
+            seeker_name=request.seeker_profile.name,
+            seeker_skills=request.seeker_profile.skills,
+            seeker_experience_years=request.seeker_profile.experience_years,
+            seeker_region=request.seeker_profile.region_code,
         )
 
+        result = await advisor.advise(request.message, context)
+
         return {
-            "request_id": str(uuid.uuid4()),
-            "response": response.content[0].text,
-            "agent": "advisor_agent",
-            "confidence": 0.88
+            "request_id": result.request_id,
+            "response": result.response_text,
+            "agent": result.agent,
+            "confidence": result.confidence,
         }
 
     except Exception as e:
