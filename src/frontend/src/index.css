@@ -9,6 +9,10 @@
     box-sizing: border-box;
   }
 
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
     font-family: 'Inter', system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
@@ -29,20 +33,37 @@
   ::-webkit-scrollbar-thumb:hover {
     background: rgba(100, 116, 139, 0.5);
   }
+
+  /* Selection color */
+  ::selection {
+    background: rgba(51, 102, 255, 0.3);
+    color: #fff;
+  }
 }
 
 @layer components {
-  /* Glass card effect */
+  /* ─── Glass Card Effect ─────────────────────────────────────────── */
   .glass-card {
     @apply bg-white/[0.04] backdrop-blur-xl border border-white/[0.08] rounded-2xl;
   }
 
-  /* Gradient text */
+  .glass-card-hover {
+    @apply bg-white/[0.04] backdrop-blur-xl border border-white/[0.08] rounded-2xl
+           transition-all duration-300 ease-out
+           hover:bg-white/[0.07] hover:border-white/[0.15] hover:shadow-xl hover:shadow-brand-500/[0.05]
+           hover:-translate-y-0.5;
+  }
+
+  /* ─── Gradient Text ─────────────────────────────────────────────── */
   .gradient-text {
     @apply bg-gradient-to-r from-brand-400 via-blue-400 to-cyan-400 bg-clip-text text-transparent;
   }
 
-  /* Glow button */
+  .gradient-text-warm {
+    @apply bg-gradient-to-r from-amber-400 via-orange-400 to-red-400 bg-clip-text text-transparent;
+  }
+
+  /* ─── Glow Button ───────────────────────────────────────────────── */
   .btn-glow {
     @apply relative overflow-hidden bg-gradient-to-r from-brand-500 to-brand-600
            text-white font-semibold rounded-xl px-6 py-3
@@ -61,18 +82,35 @@
     @apply translate-x-[100%];
   }
 
-  /* Input field */
+  /* ─── Secondary Button ──────────────────────────────────────────── */
+  .btn-outline {
+    @apply px-5 py-2.5 rounded-xl text-sm font-medium
+           border border-white/[0.12] text-surface-300
+           transition-all duration-200
+           hover:bg-white/[0.06] hover:border-brand-500/30 hover:text-white
+           active:scale-[0.98];
+  }
+
+  /* ─── Ghost Button ──────────────────────────────────────────────── */
+  .btn-ghost {
+    @apply px-4 py-2 rounded-lg text-sm font-medium text-surface-400
+           transition-all duration-200
+           hover:bg-white/[0.06] hover:text-white;
+  }
+
+  /* ─── Input Field ───────────────────────────────────────────────── */
   .input-dark {
     @apply w-full bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3
-           text-white placeholder-surface-400 outline-none
+           text-white placeholder-surface-500 outline-none
            transition-all duration-200
            focus:border-brand-500/50 focus:ring-2 focus:ring-brand-500/20 focus:bg-white/[0.07];
   }
 
-  /* Tag/badge */
+  /* ─── Skill Tags ────────────────────────────────────────────────── */
   .skill-tag {
     @apply inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium
-           bg-brand-500/15 text-brand-300 border border-brand-500/20;
+           bg-brand-500/15 text-brand-300 border border-brand-500/20
+           transition-all duration-150;
   }
 
   .skill-tag-missing {
@@ -80,7 +118,18 @@
            bg-amber-500/15 text-amber-300 border border-amber-500/20;
   }
 
-  /* Score ring */
+  .skill-tag-matched {
+    @apply inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium
+           bg-emerald-500/15 text-emerald-300 border border-emerald-500/20;
+  }
+
+  .skill-tag-interactive {
+    @apply inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-medium
+           border cursor-pointer transition-all duration-200
+           select-none;
+  }
+
+  /* ─── Score Ring ─────────────────────────────────────────────────── */
   .score-ring {
     @apply relative w-14 h-14 rounded-full flex items-center justify-center
            text-sm font-bold;
@@ -99,7 +148,7 @@
     @apply relative z-10;
   }
 
-  /* Tab button */
+  /* ─── Tab Buttons ───────────────────────────────────────────────── */
   .tab-btn {
     @apply relative px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200
            text-surface-400 hover:text-white hover:bg-white/[0.05];
@@ -113,5 +162,111 @@
     content: '';
     @apply absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-0.5
            bg-gradient-to-r from-brand-400 to-cyan-400 rounded-full;
+  }
+
+  /* ─── Feature Card ──────────────────────────────────────────────── */
+  .feature-card {
+    @apply relative bg-white/[0.03] backdrop-blur-xl border border-white/[0.06] rounded-2xl p-6
+           transition-all duration-500 ease-out overflow-hidden;
+  }
+
+  .feature-card::before {
+    content: '';
+    @apply absolute inset-0 bg-gradient-to-br from-brand-500/[0.05] to-transparent
+           opacity-0 transition-opacity duration-500;
+  }
+
+  .feature-card:hover::before {
+    @apply opacity-100;
+  }
+
+  .feature-card:hover {
+    @apply border-brand-500/20 shadow-xl shadow-brand-500/[0.08] -translate-y-1;
+  }
+
+  /* ─── Stat Card ─────────────────────────────────────────────────── */
+  .stat-card {
+    @apply text-center p-5 rounded-2xl bg-white/[0.03] border border-white/[0.06]
+           transition-all duration-300
+           hover:bg-white/[0.06] hover:border-brand-500/20;
+  }
+
+  /* ─── Badge ─────────────────────────────────────────────────────── */
+  .badge {
+    @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold
+           tracking-wide uppercase;
+  }
+
+  .badge-brand {
+    @apply badge bg-brand-500/15 text-brand-300 border border-brand-500/20;
+  }
+
+  .badge-success {
+    @apply badge bg-emerald-500/15 text-emerald-300 border border-emerald-500/20;
+  }
+
+  .badge-warning {
+    @apply badge bg-amber-500/15 text-amber-400 border border-amber-500/20;
+  }
+
+  .badge-danger {
+    @apply badge bg-red-500/15 text-red-400 border border-red-500/20;
+  }
+
+  /* ─── Saved Job Bookmark ────────────────────────────────────────── */
+  .bookmark-btn {
+    @apply p-2 rounded-lg transition-all duration-200
+           text-surface-500 hover:text-amber-400 hover:bg-amber-500/10;
+  }
+
+  .bookmark-btn.saved {
+    @apply text-amber-400 bg-amber-500/10;
+  }
+
+  /* ─── Skeleton Loading ──────────────────────────────────────────── */
+  .skeleton {
+    @apply bg-white/[0.06] rounded-lg animate-pulse;
+  }
+
+  /* ─── Toast Override ────────────────────────────────────────────── */
+  .toast-custom {
+    @apply bg-surface-800 text-white border border-white/[0.1] rounded-xl shadow-2xl;
+  }
+
+  /* ─── Divider ───────────────────────────────────────────────────── */
+  .divider {
+    @apply border-t border-white/[0.06];
+  }
+
+  /* ─── Step Connector (How It Works) ─────────────────────────────── */
+  .step-connector {
+    @apply hidden md:block absolute top-8 left-[calc(50%+2rem)] w-[calc(100%-4rem)] h-px
+           bg-gradient-to-r from-brand-500/30 via-brand-500/10 to-transparent;
+  }
+}
+
+@layer utilities {
+  /* ─── Animation Utilities ───────────────────────────────────────── */
+  .animation-delay-150 {
+    animation-delay: 150ms;
+  }
+  .animation-delay-300 {
+    animation-delay: 300ms;
+  }
+  .animation-delay-500 {
+    animation-delay: 500ms;
+  }
+  .animation-delay-700 {
+    animation-delay: 700ms;
+  }
+
+  /* ─── Text Glow ─────────────────────────────────────────────────── */
+  .text-glow {
+    text-shadow: 0 0 20px rgba(51, 102, 255, 0.5);
+  }
+
+  /* ─── Number Tabular ────────────────────────────────────────────── */
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
   }
 }
