@@ -107,7 +107,41 @@ const useStore = create(
             // ══════════════════════════════════════════════════════════════════
 
             activeTab: 'home',
-            setActiveTab: (tab) => set({ activeTab: tab }),
+            setActiveTab: (tab) => {
+                const state = get()
+                const { isAuthenticated, userRole, openAuthModal } = state
+
+                const protectedTabs = ['match', 'gap', 'dashboard', 'saved', 'verification', 'advisor']
+                const employerTabs = ['employer']
+
+                // Protect seeker features
+                if (protectedTabs.includes(tab)) {
+                    if (!isAuthenticated) {
+                        toast('Silakan Masuk untuk mengakses fitur ini', { icon: '🔒', id: 'auth-toast' })
+                        openAuthModal('login')
+                        return
+                    }
+                    if (userRole !== 'seeker') {
+                        toast.error('Akses Ditolak: Fitur ini khusus untuk Pencari Kerja')
+                        return
+                    }
+                }
+
+                // Protect employer features
+                if (employerTabs.includes(tab)) {
+                    if (!isAuthenticated) {
+                        toast('Silakan Masuk sebagai Pemberi Kerja', { icon: '🔒', id: 'auth-toast' })
+                        openAuthModal('login')
+                        return
+                    }
+                    if (userRole !== 'employer') {
+                        toast.error('Akses Ditolak: Fitur ini khusus untuk Pemberi Kerja')
+                        return
+                    }
+                }
+
+                set({ activeTab: tab })
+            },
 
             // ══════════════════════════════════════════════════════════════════
             //  SEEKER PROFILE

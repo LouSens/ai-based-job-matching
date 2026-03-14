@@ -16,6 +16,14 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
+from src.api.database import init_db
+from src.api.services.auth_service import configure as configure_auth
+
+# Import our new routers
+from src.api.routers.auth import router as auth_router
+from src.api.routers.employer import router as employer_router
+from src.api.routers.seeker import router as seeker_router
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -258,7 +266,14 @@ MOCK_JOBS = [
 async def lifespan(app: FastAPI):
     """Application startup and shutdown."""
     logger.info("🚀 KerjaCerdas API starting up...")
-    # In production: initialize DB connections, load ML models, warm up agents
+    
+    # Initialize DB (Creates SQLite/Postgres tables)
+    await init_db()
+    
+    # Configure Auth Service (In production this reads from .env)
+    configure_auth(secret_key="kerjacerdas-dev-secret-change-in-production")
+    
+    # In production: initialize further connections, load ML models, warm up agents
     yield
     logger.info("KerjaCerdas API shutting down...")
 
@@ -279,6 +294,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Include the newly refactored routers
+app.include_router(auth_router, prefix="/api/v1")
+app.include_router(employer_router, prefix="/api/v1")
+app.include_router(seeker_router, prefix="/api/v1")
 
 
 # ─── Middleware: Request Logging ──────────────────────────────────────────────

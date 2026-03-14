@@ -149,9 +149,9 @@ export default function LandingHero() {
                             </h1>
 
                             {/* Subheadline */}
-                            <p className="text-xl sm:text-2xl font-bold text-ink max-w-3xl mx-auto leading-relaxed animate-fade-in-up animation-delay-300">
-                                Menghubungkan <span className="bg-[#B8FF6D] px-2 py-1 border-[3px] border-ink inline-block transform -rotate-1 shadow-[2px_2px_0px_#111827]">Pencari Kerja</span> dengan{' '}
-                                <span className="bg-[#FF90E8] px-2 py-1 border-[3px] border-ink inline-block transform rotate-1 shadow-[2px_2px_0px_#111827]">Perusahaan</span> di seluruh Indonesia.
+                            <p className="text-xl sm:text-2xl font-bold text-ink max-w-3xl mx-auto leading-loose sm:leading-relaxed animate-fade-in-up animation-delay-300">
+                                Menghubungkan <span className="bg-[#B8FF6D] px-2 py-1 border-[3px] border-ink inline-block transform -rotate-1 shadow-[2px_2px_0px_#111827] mx-1">Pencari Kerja</span> dengan{' '}
+                                <span className="bg-[#FF90E8] px-2 py-1 border-[3px] border-ink inline-block transform rotate-1 shadow-[2px_2px_0px_#111827] mx-1 mt-2 sm:mt-0">Perusahaan</span> di seluruh Indonesia.
                             </p>
 
                             {/* Audience Switcher */}

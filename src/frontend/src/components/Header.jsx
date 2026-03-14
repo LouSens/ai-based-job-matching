@@ -96,10 +96,10 @@ export default function Header() {
                                         key={tab.id}
                                         id={`tab-${tab.id}`}
                                         onClick={() => handleTabClick(tab.id)}
-                                        className={`group relative flex items-center gap-1.5 px-3.5 py-2 text-sm font-semibold rounded-full focus:outline-none transition-all duration-300 ${
+                                        className={`group relative flex items-center gap-1.5 px-3.5 py-2 text-sm font-black rounded-xl border-[2px] focus:outline-none transition-all duration-300 ${
                                             isActive 
-                                              ? 'text-brand-700 bg-brand-50 shadow-sm ring-1 ring-brand-200' 
-                                              : 'text-surface-600 hover:text-surface-900 hover:bg-surface-100'
+                                              ? 'text-ink bg-[#B8FF6D] border-ink shadow-[2px_2px_0px_#111827]' 
+                                              : 'text-ink/70 border-transparent hover:text-ink hover:border-ink hover:bg-white hover:shadow-[2px_2px_0px_#111827] hover:-translate-y-0.5'
                                             }`}
                                     >
                                         <Icon className={`w-4 h-4 transition-colors ${isActive ? 'text-brand-600' : 'text-surface-400 group-hover:text-surface-600'}`} strokeWidth={2.5} />
@@ -121,13 +121,13 @@ export default function Header() {
                                 <div className="hidden xl:flex items-center gap-2">
                                     <button
                                         onClick={() => openAuthModal('login')}
-                                        className="text-sm font-semibold text-surface-700 px-4 py-2.5 rounded-full hover:bg-surface-100 hover:text-surface-900 transition-colors flex items-center gap-2"
+                                        className="text-sm font-black text-ink px-4 py-2.5 rounded-xl border-[2px] border-transparent hover:border-ink hover:bg-[#FF90E8] hover:shadow-[2px_2px_0px_#111827] hover:-translate-y-0.5 transition-all flex items-center gap-2"
                                     >
                                         Masuk
                                     </button>
                                     <button
                                         onClick={() => openAuthModal('register')}
-                                        className="bg-brand-600 text-white text-sm font-semibold px-5 py-2.5 rounded-full hover:bg-brand-700 shadow-sm hover:shadow transition-all flex items-center gap-2 transform active:scale-95"
+                                        className="bg-[#00E5FF] text-ink text-sm font-black px-5 py-2.5 rounded-xl border-[2px] border-ink shadow-[2px_2px_0px_#111827] hover:shadow-[4px_4px_0px_#111827] hover:-translate-y-1 transition-all flex items-center gap-2"
                                     >
                                         Daftar Gratis
                                     </button>
@@ -136,16 +136,16 @@ export default function Header() {
                                 <div className="relative hidden xl:block">
                                     <button
                                         onClick={() => setShowUserMenu(!showUserMenu)}
-                                        className="flex items-center gap-3 pl-3 pr-4 py-1.5 rounded-full bg-white border border-surface-200 shadow-sm hover:shadow-md hover:border-surface-300 transition-all focus:outline-none"
+                                        className="flex items-center gap-3 pl-3 pr-4 py-1.5 rounded-xl bg-white border-[2px] border-ink shadow-[2px_2px_0px_#111827] hover:shadow-[4px_4px_0px_#111827] hover:-translate-y-0.5 transition-all focus:outline-none"
                                     >
-                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white shadow-inner ${
-                                            userRole === 'employer' ? 'bg-gradient-to-br from-emerald-400 to-teal-500' : 'bg-gradient-to-br from-brand-400 to-brand-600'
+                                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-black text-ink border-[2px] border-ink ${
+                                            userRole === 'employer' ? 'bg-[#B8FF6D]' : 'bg-[#FFC900]'
                                         }`}>
                                             {(user.name || 'U').charAt(0).toUpperCase()}
                                         </div>
                                         <div className="text-left hidden md:block">
-                                            <p className="text-sm font-bold text-surface-900 truncate max-w-[120px] leading-tight">{user.name}</p>
-                                            <p className="text-[10px] font-semibold text-surface-500 uppercase tracking-wider leading-tight">
+                                            <p className="text-sm font-black text-ink truncate max-w-[120px] leading-tight">{user.name}</p>
+                                            <p className="text-[10px] font-bold text-ink/70 uppercase tracking-wider leading-tight">
                                                 {userRole === 'employer' ? 'Employer' : 'Pencari Kerja'}
                                             </p>
                                         </div>
