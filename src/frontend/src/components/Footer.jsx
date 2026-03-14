@@ -118,7 +118,7 @@ export default function Footer() {
                 {/* Bottom bar */}
                 <div className="border-t-2 border-surface-200 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
                     <p className="text-xs font-semibold text-surface-500">
-                        © 2026 KerjaCerdas · Antigravity Protocol v1.0 ·{' '}
+                        © 2026 KerjaCerdas    ·{' '}
                         <button onClick={() => setActiveTab('privacy')} className="hover:text-brand-600 transition-colors underline decoration-surface-300 underline-offset-4">
                             Kebijakan Privasi
                         </button>
