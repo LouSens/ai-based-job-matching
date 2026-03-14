@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import useStore from './store/useStore'
 import Header from './components/Header'
 import AuthModal from './components/AuthModal'
@@ -11,146 +12,124 @@ import SavedJobsPage from './components/SavedJobsPage'
 import EmployerDashboard from './components/EmployerDashboard'
 import PrivacyPolicyPage from './components/PrivacyPolicyPage'
 import Footer from './components/Footer'
+import VerificationDashboard from './components/VerificationDashboard'
 
 /**
  * App — Root component with role-aware routing.
- * Renders header, active tab content, auth modal, and footer.
- *
- * Architecture:
- *   App → AuthModal (overlay)
- *       → Header (nav + auth + tabs)
- *       → Routes:
- *           Guest:   home, privacy
- *           Seeker:  home, match, gap, advisor, dashboard, saved, privacy
- *           Employer: home, employer, advisor, privacy
- *       → Footer
- *
- * State: Zustand (useStore)
- * API:   services/api.js → FastAPI :8000
  */
 export default function App() {
     const { activeTab, matches, matchError, isAuthenticated, userRole } = useStore()
 
+    useEffect(() => {
+        window.scrollTo(0, 0)
+    }, [activeTab])
+
     return (
-        <div className="min-h-screen bg-surface-950 flex flex-col">
-            {/* Background ambient effects */}
-            <div className="fixed inset-0 -z-10 overflow-hidden">
-                <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-brand-500/[0.06] rounded-full blur-[150px] animate-float" />
-                <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-cyan-500/[0.04] rounded-full blur-[120px] animate-float animation-delay-300" />
-                <div className="absolute top-1/2 left-1/2 w-[300px] h-[300px] bg-purple-500/[0.03] rounded-full blur-[100px] animate-float animation-delay-700" />
-            </div>
-
-            {/* Auth Modal (overlay) */}
+        <div className="min-h-screen flex flex-col font-sans selection:bg-brand-500 selection:text-white">
             <AuthModal />
-
             <Header />
 
-            <main className="flex-1">
-                {/* ── LANDING / HOME TAB ── */}
-                {activeTab === 'home' && <LandingHero />}
+            <main className="flex-1 w-full bg-surface-50 relative pt-24 pb-12">
+                {/* Subtle grid background to enhance brutalist neo-minimalist look */}
+                <div className="absolute inset-0 z-0 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle, #D4D4D8 1px, transparent 1px)', backgroundSize: '24px 24px', opacity: 0.4 }} />
 
-                {/* ── PRIVACY & POLICY ── */}
-                {activeTab === 'privacy' && (
-                    <PrivacyPolicyPage />
-                )}
+                <div className="relative z-10">
+                    {activeTab === 'home' && <LandingHero />}
 
-                {/* ══════════════════════════════════════════════════════════════
-                    SEEKER TABS
-                   ══════════════════════════════════════════════════════════════ */}
+                    {activeTab === 'privacy' && <PrivacyPolicyPage />}
 
-                {/* ── MATCH TAB (seeker) ── */}
-                {activeTab === 'match' && (!isAuthenticated || userRole === 'seeker') && (
-                    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 space-y-5">
-                        <SearchForm />
+                    {/* SEEKER TABS */}
+                    {activeTab === 'match' && (!isAuthenticated || userRole === 'seeker') && (
+                        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 space-y-6">
+                            <SearchForm />
 
-                        {matchError && (
-                            <div className="glass-card p-4 border-red-500/20 animate-fade-in">
-                                <p className="text-sm text-red-400">⚠️ {matchError}</p>
-                                <p className="text-xs text-surface-400 mt-1">
-                                    Pastikan API berjalan: <code className="text-brand-400">uvicorn src.api.main:app --port 8000</code>
-                                </p>
-                            </div>
-                        )}
+                            {matchError && (
+                                <div className="p-5 border-[3px] border-ink bg-rose-100 rounded-2xl animate-fade-in shadow-[4px_4px_0px_#111827]">
+                                    <p className="text-base font-black text-rose-600 uppercase tracking-tight">⚠️ Server Error / API Offline</p>
+                                    <p className="text-sm text-rose-600 mt-2 font-bold opacity-90">
+                                        Pastikan backend berjalan: <code className="text-rose-700 font-black bg-rose-200 border-2 border-rose-300 px-2 py-0.5 rounded-md ml-1 inline-block shadow-sm">uvicorn src.api.main:app --port 8000</code>
+                                    </p>
+                                </div>
+                            )}
 
-                        {matches.length > 0 && (
-                            <div className="animate-fade-in">
-                                <div className="flex items-center justify-between mb-4">
-                                    <div>
-                                        <h2 className="text-lg font-bold">
-                                            Hasil Matching <span className="gradient-text">AI</span>
-                                        </h2>
-                                        <p className="text-xs text-surface-400 mt-0.5">
-                                            Ditemukan {matches.length} lowongan · Diurutkan berdasarkan skor tertinggi
-                                        </p>
+                            {matches.length > 0 && (
+                                <div className="animate-fade-in">
+                                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 mt-10">
+                                        <div>
+                                            <h2 className="text-2xl md:text-3xl font-black text-ink uppercase tracking-tight">
+                                                Hasil Matching <span className="text-white bg-ink px-2 py-0.5 rounded-lg border-2 border-ink shadow-[2px_2px_0px_#B8FF6D] transform -rotate-2 inline-block ml-1">AI</span>
+                                            </h2>
+                                            <p className="text-sm font-bold text-ink/70 mt-2 uppercase tracking-wider">
+                                                Ditemukan {matches.length} lowongan terbaik
+                                            </p>
+                                        </div>
+                                        <span className="inline-flex items-center gap-2 bg-[#B8FF6D] border-[3px] border-ink px-3 py-1.5 rounded-xl text-xs font-black shadow-[2px_2px_0px_#111827] uppercase tracking-widest text-ink">
+                                            <span className="w-2.5 h-2.5 rounded-full bg-ink animate-pulse"></span>
+                                            AI Powered
+                                        </span>
                                     </div>
-                                    <span className="badge-brand">
-                                        <span className="w-1.5 h-1.5 rounded-full bg-brand-400 animate-pulse-soft"></span>
-                                        AI Powered
-                                    </span>
+                                    <div className="space-y-4">
+                                        {matches.map((job, i) => (
+                                            <JobCard key={job.job_id || i} job={job} index={i} />
+                                        ))}
+                                    </div>
                                 </div>
-                                <div className="space-y-3">
-                                    {matches.map((job, i) => (
-                                        <JobCard key={job.job_id || i} job={job} index={i} />
-                                    ))}
+                            )}
+
+                            {matches.length === 0 && !matchError && (
+                                <div className="text-center py-20 animate-fade-in bg-white border-[3px] border-ink rounded-[2rem] shadow-[8px_8px_0px_#111827]">
+                                    <div className="w-24 h-24 rounded-[2rem] bg-[#B8FF6D] border-[4px] border-ink flex items-center justify-center text-5xl mx-auto mb-6 shadow-[6px_6px_0px_#111827] transform -rotate-3 hover:rotate-0 transition-transform">
+                                        🚀
+                                    </div>
+                                    <h3 className="text-2xl md:text-3xl font-black text-ink mb-4 uppercase tracking-tight">
+                                        Temukan Pekerjaan Impianmu
+                                    </h3>
+                                    <p className="text-base text-ink font-bold max-w-md mx-auto leading-relaxed opacity-80">
+                                        Isi profil di atas dan klik <span className="text-ink font-black bg-[#FFC900] border-2 border-ink shadow-[2px_2px_0px_#111827] px-2 py-0.5 rounded-lg mx-1 inline-block transform rotate-1">"Temukan Pekerjaan"</span> untuk
+                                        mendapatkan rekomendasi pekerjaan yang cocok dengan skill kamu.
+                                    </p>
                                 </div>
-                            </div>
-                        )}
+                            )}
+                        </div>
+                    )}
 
-                        {matches.length === 0 && !matchError && (
-                            <div className="text-center py-16 animate-fade-in">
-                                <div className="w-20 h-20 rounded-2xl bg-brand-500/10 border border-brand-500/20 flex items-center justify-center text-4xl mx-auto mb-5 animate-float">
-                                    🚀
-                                </div>
-                                <h3 className="text-xl font-bold gradient-text mb-2">
-                                    Temukan Pekerjaan Impianmu
-                                </h3>
-                                <p className="text-sm text-surface-400 max-w-md mx-auto leading-relaxed">
-                                    Isi profil di atas dan klik <span className="text-brand-400 font-medium">"Temukan Pekerjaan"</span> untuk
-                                    mendapatkan rekomendasi pekerjaan yang cocok dengan skill kamu menggunakan AI.
-                                </p>
-                            </div>
-                        )}
-                    </div>
-                )}
+                    {activeTab === 'gap' && (!isAuthenticated || userRole === 'seeker') && (
+                        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
+                            <SkillGapPanel />
+                        </div>
+                    )}
 
-                {/* ── SKILL GAP TAB (seeker) ── */}
-                {activeTab === 'gap' && (!isAuthenticated || userRole === 'seeker') && (
-                    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6">
-                        <SkillGapPanel />
-                    </div>
-                )}
+                    {activeTab === 'advisor' && (
+                        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
+                            <AdvisorChat />
+                        </div>
+                    )}
 
-                {/* ── ADVISOR TAB (both roles) ── */}
-                {activeTab === 'advisor' && (
-                    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6">
-                        <AdvisorChat />
-                    </div>
-                )}
+                    {activeTab === 'verification' && (!isAuthenticated || userRole === 'seeker') && (
+                        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
+                            <VerificationDashboard />
+                        </div>
+                    )}
 
-                {/* ── DASHBOARD TAB (seeker) ── */}
-                {activeTab === 'dashboard' && (!isAuthenticated || userRole === 'seeker') && (
-                    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6">
-                        <DashboardPage />
-                    </div>
-                )}
+                    {activeTab === 'dashboard' && (!isAuthenticated || userRole === 'seeker') && (
+                        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
+                            <DashboardPage />
+                        </div>
+                    )}
 
-                {/* ── SAVED JOBS TAB (seeker) ── */}
-                {activeTab === 'saved' && (!isAuthenticated || userRole === 'seeker') && (
-                    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6">
-                        <SavedJobsPage />
-                    </div>
-                )}
+                    {activeTab === 'saved' && (!isAuthenticated || userRole === 'seeker') && (
+                        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
+                            <SavedJobsPage />
+                        </div>
+                    )}
 
-                {/* ══════════════════════════════════════════════════════════════
-                    EMPLOYER TABS
-                   ══════════════════════════════════════════════════════════════ */}
-
-                {/* ── EMPLOYER DASHBOARD ── */}
-                {activeTab === 'employer' && isAuthenticated && userRole === 'employer' && (
-                    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6">
-                        <EmployerDashboard />
-                    </div>
-                )}
+                    {/* EMPLOYER TABS */}
+                    {activeTab === 'employer' && isAuthenticated && userRole === 'employer' && (
+                        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
+                            <EmployerDashboard />
+                        </div>
+                    )}
+                </div>
             </main>
 
             <Footer />

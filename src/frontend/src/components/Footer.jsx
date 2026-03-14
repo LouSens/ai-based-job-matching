@@ -9,18 +9,18 @@ export default function Footer() {
     const { setActiveTab, openAuthModal } = useStore()
 
     return (
-        <footer className="border-t border-white/[0.04] mt-auto">
-            <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10">
-                <div className="grid md:grid-cols-4 gap-8 mb-8">
+        <footer className="border-t-2 border-surface-200 mt-auto bg-white">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12">
+                <div className="grid md:grid-cols-4 gap-12 md:gap-8 mb-12">
                     {/* Brand */}
                     <div>
-                        <div className="flex items-center gap-2 mb-3">
-                            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-brand-500 to-cyan-500 flex items-center justify-center">
-                                <Zap className="w-4 h-4 text-white" />
+                        <div className="flex items-center gap-3 mb-4">
+                            <div className="w-8 h-8 rounded-xl bg-brand-400 border-2 border-ink flex items-center justify-center shadow-brutal-sm">
+                                <Zap className="w-4 h-4 text-ink flex-shrink-0" />
                             </div>
-                            <span className="font-bold text-sm">KerjaCerdas</span>
+                            <span className="font-extrabold text-lg text-ink tracking-tight">KerjaCerdas</span>
                         </div>
-                        <p className="text-xs text-surface-500 leading-relaxed max-w-xs">
+                        <p className="text-sm font-medium text-surface-600 leading-relaxed max-w-xs">
                             Platform AI-powered job matching untuk Indonesia.
                             Menghubungkan pencari kerja dengan pemberi kerja
                             menggunakan kecerdasan buatan.
@@ -29,11 +29,11 @@ export default function Footer() {
 
                     {/* For Job Seekers */}
                     <div>
-                        <p className="text-[10px] text-surface-500 uppercase tracking-widest font-semibold mb-3 flex items-center gap-1.5">
-                            <Search className="w-3 h-3" />
+                        <p className="text-xs text-ink uppercase tracking-widest font-extrabold mb-4 flex items-center gap-2">
+                            <Search className="w-4 h-4 text-brand-500" />
                             Pencari Kerja
                         </p>
-                        <ul className="space-y-2">
+                        <ul className="space-y-3">
                             {[
                                 { label: 'Cari Pekerjaan', action: () => setActiveTab('match') },
                                 { label: 'Analisis Skill Gap', action: () => setActiveTab('gap') },
@@ -43,7 +43,7 @@ export default function Footer() {
                                 <li key={item.label}>
                                     <button
                                         onClick={item.action}
-                                        className="text-xs text-surface-400 hover:text-surface-200 transition-colors"
+                                        className="text-sm font-semibold text-surface-500 hover:text-brand-600 transition-colors"
                                     >
                                         {item.label}
                                     </button>
@@ -54,11 +54,11 @@ export default function Footer() {
 
                     {/* For Employers */}
                     <div>
-                        <p className="text-[10px] text-surface-500 uppercase tracking-widest font-semibold mb-3 flex items-center gap-1.5">
-                            <Building2 className="w-3 h-3" />
+                        <p className="text-xs text-ink uppercase tracking-widest font-extrabold mb-4 flex items-center gap-2">
+                            <Building2 className="w-4 h-4 text-emerald-500" />
                             Pemberi Kerja
                         </p>
-                        <ul className="space-y-2">
+                        <ul className="space-y-3">
                             {[
                                 { label: 'Pasang Lowongan', action: () => openAuthModal('register') },
                                 { label: 'Cari Kandidat AI', action: () => openAuthModal('register') },
@@ -68,7 +68,7 @@ export default function Footer() {
                                 <li key={item.label}>
                                     <button
                                         onClick={item.action}
-                                        className="text-xs text-surface-400 hover:text-surface-200 transition-colors"
+                                        className="text-sm font-semibold text-surface-500 hover:text-brand-600 transition-colors"
                                     >
                                         {item.label}
                                     </button>
@@ -79,23 +79,24 @@ export default function Footer() {
 
                     {/* Legal & Resources */}
                     <div>
-                        <p className="text-[10px] text-surface-500 uppercase tracking-widest font-semibold mb-3">Resources & Legal</p>
-                        <ul className="space-y-2">
+                        <p className="text-xs text-ink uppercase tracking-widest font-extrabold mb-4 flex items-center gap-2">
+                            <Shield className="w-4 h-4 text-purple-500" />
+                            Res. & Legal
+                        </p>
+                        <ul className="space-y-3">
                             <li>
                                 <button
                                     onClick={() => setActiveTab('privacy')}
-                                    className="text-xs text-surface-400 hover:text-surface-200 transition-colors flex items-center gap-1"
+                                    className="text-sm font-semibold text-surface-500 hover:text-brand-600 transition-colors flex items-center gap-2"
                                 >
-                                    <Shield className="w-2.5 h-2.5" />
                                     Kebijakan Privasi
                                 </button>
                             </li>
                             <li>
                                 <button
                                     onClick={() => setActiveTab('privacy')}
-                                    className="text-xs text-surface-400 hover:text-surface-200 transition-colors flex items-center gap-1"
+                                    className="text-sm font-semibold text-surface-500 hover:text-brand-600 transition-colors flex items-center gap-2"
                                 >
-                                    <Shield className="w-2.5 h-2.5" />
                                     Syarat & Ketentuan
                                 </button>
                             </li>
@@ -104,9 +105,9 @@ export default function Footer() {
                                 { label: 'GitHub Repository', href: '#' },
                             ].map(item => (
                                 <li key={item.label}>
-                                    <a href={item.href} className="text-xs text-surface-400 hover:text-surface-200 transition-colors flex items-center gap-1">
+                                    <a href={item.href} className="text-sm font-semibold text-surface-500 hover:text-brand-600 transition-colors flex items-center gap-1.5">
                                         {item.label}
-                                        <ExternalLink className="w-2.5 h-2.5 opacity-50" />
+                                        <ExternalLink className="w-3.5 h-3.5 opacity-60" />
                                     </a>
                                 </li>
                             ))}
@@ -115,15 +116,15 @@ export default function Footer() {
                 </div>
 
                 {/* Bottom bar */}
-                <div className="border-t border-white/[0.04] pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
-                    <p className="text-[10px] text-surface-600">
+                <div className="border-t-2 border-surface-200 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <p className="text-xs font-semibold text-surface-500">
                         © 2026 KerjaCerdas · Antigravity Protocol v1.0 ·{' '}
-                        <button onClick={() => setActiveTab('privacy')} className="hover:text-surface-300 transition-colors">
+                        <button onClick={() => setActiveTab('privacy')} className="hover:text-brand-600 transition-colors underline decoration-surface-300 underline-offset-4">
                             Kebijakan Privasi
                         </button>
                     </p>
                     <div className="flex items-center gap-4">
-                        <span className="text-[10px] text-surface-600 flex items-center gap-1">
+                        <span className="text-xs font-bold text-surface-600 flex items-center gap-1">
                             Powered by IndoBERT · Google Gemini · FastAPI
                         </span>
                     </div>

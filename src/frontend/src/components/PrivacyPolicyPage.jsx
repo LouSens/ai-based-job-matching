@@ -66,7 +66,7 @@ Kami **tidak** menjual data pribadi Anda kepada pihak ketiga.`,
 • **Akses terbatas**: Hanya personel yang berwenang yang dapat mengakses data pribadi
 • **Audit keamanan**: Kami melakukan audit keamanan berkala dan penetration testing
 • **Backup terenkripsi**: Data di-backup secara berkala dengan enkripsi AES-256
-• **Blockchain verification**: Verifikasi kredensial skill menggunakan teknologi blockchain Ethereum
+• **Verifikasi Identitas**: Bekerja sama dengan Penyelenggara Sertifikasi Elektronik (PSrE) resmi untuk proses e-KYC
 • **Data residency**: Data disimpan di server yang berlokasi di Indonesia sesuai dengan UU PDP
 
 Untuk model AI kami:

@@ -133,6 +133,39 @@ class AdvisorResponse(BaseModel):
     confidence: float
 
 
+class EkycVerificationRequest(BaseModel):
+    """Request for e-KYC identity verification (Mock Dukcapil/PSrE)."""
+    nik: str = Field(..., min_length=16, max_length=16)
+    full_name: str
+    date_of_birth: str
+    selfie_image_base64: str | None = None
+
+
+class EkycVerificationResponse(BaseModel):
+    """Response from e-KYC verification."""
+    request_id: str
+    status: str  # e.g., "VERIFIED", "FAILED", "PENDING_MANUAL_REVIEW"
+    match_percentage: float
+    message: str
+    zk_commitment: str | None = None
+    pii_redacted: bool = True
+
+
+class SivilVerificationRequest(BaseModel):
+    """Request for diploma verification (Mock SIVIL/Dikti)."""
+    ijazah_number: str
+    university_name: str
+    major: str
+
+
+class SivilVerificationResponse(BaseModel):
+    """Response from diploma verification."""
+    request_id: str
+    status: str  # e.g., "VERIFIED", "NOT_FOUND"
+    message: str
+    verified_data: dict | None = None
+
+
 # ─── Mock Data (Demo Mode) ────────────────────────────────────────────────────
 
 MOCK_JOBS = [
@@ -407,3 +440,57 @@ async def list_jobs(limit: int = 10, region: str | None = None):
     """List available job postings, optionally filtered by region."""
     jobs = MOCK_JOBS[:limit]
     return {"jobs": jobs, "total": len(jobs)}
+
+
+# ─── Verification Endpoints (e-KYC & SIVIL) ───────────────────────────────────
+
+@app.post("/api/v1/verify/identity", response_model=EkycVerificationResponse)
+async def verify_identity(request: EkycVerificationRequest):
+    """
+    Mock e-KYC integration with Dukcapil/PSrE to verify candidate identity.
+    Simulates checking NIK, Name, and biometric selfie matching using Zero-Knowledge.
+    """
+    from src.api.services.zk_verifier import ZKPrivacyService
+    
+    # Process through the Zero-Knowledge Privacy Service
+    # Placed in services/ to follow project directory structure
+    zk_result = ZKPrivacyService.verify_identity_proof(
+        nik=request.nik,
+        full_name=request.full_name
+    )
+    
+    return EkycVerificationResponse(
+        request_id=str(uuid.uuid4()),
+        status="VERIFIED" if zk_result["is_valid"] else "FAILED",
+        match_percentage=zk_result["match_score"],
+        message="Identitas berhasil diverifikasi lewat ZK-Proof Hash." if zk_result["is_valid"] else "Gagal verifikasi identitas ZK-Proof.",
+        zk_commitment=zk_result["zk_commitment"],
+        pii_redacted=zk_result["pii_redacted"]
+    )
+
+
+@app.post("/api/v1/verify/education", response_model=SivilVerificationResponse)
+async def verify_education(request: SivilVerificationRequest):
+    """
+    Mock integration with SIVIL (Sistem Informasi Verifikasi Ijazah Elektronik)
+    to verify candidate's university degree authenticity.
+    """
+    # Demo logic: if ijazah number is empty or "0000", simulate not found.
+    is_valid = request.ijazah_number and request.ijazah_number != "0000"
+    
+    verified_data = None
+    if is_valid:
+        verified_data = {
+            "university": request.university_name,
+            "major": request.major,
+            "graduation_year": "2023",
+            "degree": "S1",
+            "status": "Lulus"
+        }
+        
+    return SivilVerificationResponse(
+        request_id=str(uuid.uuid4()),
+        status="VERIFIED" if is_valid else "NOT_FOUND",
+        message="Ijazah terdaftar resmi di SIVIL (Kemdikbudristek)." if is_valid else "Nomor Ijazah tidak ditemukan di database SIVIL.",
+        verified_data=verified_data
+    )
