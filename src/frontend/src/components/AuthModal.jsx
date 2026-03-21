@@ -45,10 +45,10 @@ export default function AuthModal() {
     }, [showAuthModal, closeAuthModal])
 
     useEffect(() => {
-        if (authTab === 'register' && preferredAuthRole && !role) {
+        if (preferredAuthRole && !role) {
             setRole(preferredAuthRole)
         }
-    }, [authTab, preferredAuthRole, role])
+    }, [preferredAuthRole, role])
 
     /**
      * Validates form fields and returns error object.
@@ -60,9 +60,9 @@ export default function AuthModal() {
         else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errs.email = 'Format email tidak valid'
         if (!password) errs.password = 'Password wajib diisi'
         else if (password.length < 6) errs.password = 'Password minimal 6 karakter'
+        if (!role) errs.role = 'Pilih tipe akun'
         if (authTab === 'register') {
             if (password !== confirmPassword) errs.confirmPassword = 'Password tidak cocok'
-            if (!role) errs.role = 'Pilih tipe akun'
             if (!agreeTerms) errs.terms = 'Setujui syarat dan ketentuan'
         }
         return errs
@@ -119,7 +119,7 @@ export default function AuthModal() {
         // Simulate API delay
         setTimeout(() => {
             if (authTab === 'login') {
-                login(email, password, role || 'seeker')
+                login(email, password, role)
             } else {
                 register(name, email, password, role)
             }
@@ -136,6 +136,12 @@ export default function AuthModal() {
         setRole(null); setShowPassword(false); setAgreeTerms(false); setErrors({})
     }
 
+    useEffect(() => {
+        if (!showAuthModal) {
+            resetForm()
+        }
+    }, [showAuthModal])
+
     /**
      * Switches between login and register tabs and resets errors.
      */
@@ -149,10 +155,10 @@ export default function AuthModal() {
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
             {/* Backdrop */}
-            <div
-                className="absolute inset-0 bg-ink/40 backdrop-blur-sm animate-fade-in"
-                onClick={closeAuthModal}
-            />
+                <div
+                    className="absolute inset-0 bg-ink/40 backdrop-blur-sm animate-fade-in"
+                    onClick={closeAuthModal}
+                />
 
             {/* Modal */}
             <div
@@ -209,81 +215,80 @@ export default function AuthModal() {
 
                 {/* Form */}
                 <form onSubmit={handleSubmit} className="px-6 pb-8 space-y-5">
-                    {/* Role selection (register only) */}
-                    {authTab === 'register' && (
-                        <div className="space-y-3">
-                            <label id="role-label" className="text-xs font-black uppercase tracking-widest text-ink flex items-center gap-2">
-                                <UserCheck className="w-5 h-5 text-ink" strokeWidth={3} />
-                                Saya adalah... <span className="text-red-500 font-extrabold">*</span>
-                            </label>
-                            <p className="text-[11px] font-bold text-ink/60 uppercase tracking-wide">Pilih peran dulu, biar form langsung nyambung boss.</p>
-                            <div
-                                role="radiogroup"
-                                aria-labelledby="role-label"
-                                aria-invalid={Boolean(errors.role)}
-                                className="grid grid-cols-2 gap-4"
+                    <div className="space-y-3">
+                        <label id="role-label" className="text-xs font-black uppercase tracking-widest text-ink flex items-center gap-2">
+                            <UserCheck className="w-5 h-5 text-ink" strokeWidth={3} />
+                            Saya adalah... <span className="text-red-500 font-extrabold">*</span>
+                        </label>
+                        <p className="text-[11px] font-bold text-ink/60 uppercase tracking-wide">
+                            {authTab === 'login'
+                                ? 'Pilih peran biar kamu masuk ke jalur yang benar.'
+                                : 'Pilih peran dulu, biar form langsung nyambung boss.'}
+                        </p>
+                        <div
+                            role="radiogroup"
+                            aria-labelledby="role-label"
+                            aria-invalid={Boolean(errors.role)}
+                            className="grid grid-cols-2 gap-4"
+                        >
+                            <button
+                                type="button"
+                                role="radio"
+                                aria-checked={role === 'seeker'}
+                                tabIndex={role === 'employer' ? -1 : 0}
+                                onClick={() => selectRole('seeker')}
+                                onKeyDown={(e) => handleRoleKeyDown(e, 'seeker')}
+                                className={`relative p-5 rounded-2xl border-[3px] text-left transition-all duration-200 ${role === 'seeker'
+                                        ? 'bg-[#00E5FF] border-ink shadow-[4px_4px_0px_#111827] transform -rotate-1'
+                                        : 'bg-white border-ink hover:bg-[#00E5FF]/10 hover:shadow-[4px_4px_0px_#111827] hover:-translate-y-1'
+                                    }`}
                             >
-                                {/* Seeker role */}
-                                <button
-                                    type="button"
-                                    role="radio"
-                                    aria-checked={role === 'seeker'}
-                                    tabIndex={role === 'employer' ? -1 : 0}
-                                    onClick={() => selectRole('seeker')}
-                                    onKeyDown={(e) => handleRoleKeyDown(e, 'seeker')}
-                                    className={`relative p-5 rounded-2xl border-[3px] text-left transition-all duration-200 ${role === 'seeker'
-                                            ? 'bg-[#00E5FF] border-ink shadow-[4px_4px_0px_#111827] transform -rotate-1'
-                                            : 'bg-white border-ink hover:bg-[#00E5FF]/10 hover:shadow-[4px_4px_0px_#111827] hover:-translate-y-1'
-                                        }`}
-                                >
-                                    {role === 'seeker' && (
-                                        <span className="absolute top-2 right-2 text-[10px] font-black uppercase bg-white border-2 border-ink px-1.5 py-0.5 rounded-md shadow-[2px_2px_0px_#111827]">
-                                            Dipilih
-                                        </span>
-                                    )}
-                                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-3 border-[3px] ${role === 'seeker'
-                                            ? 'bg-white border-ink shadow-[2px_2px_0px_#111827]'
-                                            : 'bg-surface-100 border-ink border-dashed text-ink/40'
-                                        }`}>
-                                        <Search className={`w-6 h-6 ${role === 'seeker' ? 'text-ink' : ''}`} strokeWidth={role === 'seeker' ? 3 : 2} />
-                                    </div>
-                                    <p className={`text-base font-black uppercase ${role === 'seeker' ? 'text-ink' : 'text-ink/60'}`}>Pejuang<br />Kerja</p>
-                                    <p className={`text-[10px] font-bold mt-1 uppercase ${role === 'seeker' ? 'text-ink/80' : 'text-ink/40'}`}>Cari Duit</p>
-                                    <p className={`text-[10px] mt-1 font-bold ${role === 'seeker' ? 'text-ink/80' : 'text-ink/50'}`}>Biar AI bantu cari lowongan yang cocok.</p>
-                                </button>
+                                {role === 'seeker' && (
+                                    <span className="absolute top-2 right-2 text-[10px] font-black uppercase bg-white border-2 border-ink px-1.5 py-0.5 rounded-md shadow-[2px_2px_0px_#111827]">
+                                        Dipilih
+                                    </span>
+                                )}
+                                <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-3 border-[3px] ${role === 'seeker'
+                                        ? 'bg-white border-ink shadow-[2px_2px_0px_#111827]'
+                                        : 'bg-surface-100 border-ink border-dashed text-ink/40'
+                                    }`}>
+                                    <Search className={`w-6 h-6 ${role === 'seeker' ? 'text-ink' : ''}`} strokeWidth={role === 'seeker' ? 3 : 2} />
+                                </div>
+                                <p className={`text-base font-black uppercase ${role === 'seeker' ? 'text-ink' : 'text-ink/60'}`}>Pejuang<br />Kerja</p>
+                                <p className={`text-[10px] font-bold mt-1 uppercase ${role === 'seeker' ? 'text-ink/80' : 'text-ink/40'}`}>Cari Duit</p>
+                                <p className={`text-[10px] mt-1 font-bold ${role === 'seeker' ? 'text-ink/80' : 'text-ink/50'}`}>Biar AI bantu cari lowongan yang cocok.</p>
+                            </button>
 
-                                {/* Employer role */}
-                                <button
-                                    type="button"
-                                    role="radio"
-                                    aria-checked={role === 'employer'}
-                                    tabIndex={role === 'seeker' ? -1 : 0}
-                                    onClick={() => selectRole('employer')}
-                                    onKeyDown={(e) => handleRoleKeyDown(e, 'employer')}
-                                    className={`relative p-5 rounded-2xl border-[3px] text-left transition-all duration-200 ${role === 'employer'
-                                            ? 'bg-[#FF90E8] border-ink shadow-[4px_4px_0px_#111827] transform rotate-1'
-                                            : 'bg-white border-ink hover:bg-[#FF90E8]/10 hover:shadow-[4px_4px_0px_#111827] hover:-translate-y-1'
-                                        }`}
-                                >
-                                    {role === 'employer' && (
-                                        <span className="absolute top-2 right-2 text-[10px] font-black uppercase bg-white border-2 border-ink px-1.5 py-0.5 rounded-md shadow-[2px_2px_0px_#111827]">
-                                            Dipilih
-                                        </span>
-                                    )}
-                                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-3 border-[3px] ${role === 'employer'
-                                            ? 'bg-white border-ink shadow-[2px_2px_0px_#111827]'
-                                            : 'bg-surface-100 border-ink border-dashed text-ink/40'
-                                        }`}>
-                                        <Building2 className={`w-6 h-6 ${role === 'employer' ? 'text-ink' : ''}`} strokeWidth={role === 'employer' ? 3 : 2} />
-                                    </div>
-                                    <p className={`text-base font-black uppercase ${role === 'employer' ? 'text-ink' : 'text-ink/60'}`}>Bos<br />Besar</p>
-                                    <p className={`text-[10px] font-bold mt-1 uppercase ${role === 'employer' ? 'text-ink/80' : 'text-ink/40'}`}>Cari Karyawan</p>
-                                    <p className={`text-[10px] mt-1 font-bold ${role === 'employer' ? 'text-ink/80' : 'text-ink/50'}`}>Pasang lowongan dan temukan kandidat satset.</p>
-                                </button>
-                            </div>
-                            {errors.role && <p className="text-[11px] font-black text-rose-500 bg-rose-100 border-2 border-rose-300 px-2 py-0.5 rounded-lg inline-block uppercase">{errors.role}</p>}
+                            <button
+                                type="button"
+                                role="radio"
+                                aria-checked={role === 'employer'}
+                                tabIndex={role === 'seeker' ? -1 : 0}
+                                onClick={() => selectRole('employer')}
+                                onKeyDown={(e) => handleRoleKeyDown(e, 'employer')}
+                                className={`relative p-5 rounded-2xl border-[3px] text-left transition-all duration-200 ${role === 'employer'
+                                        ? 'bg-[#FF90E8] border-ink shadow-[4px_4px_0px_#111827] transform rotate-1'
+                                        : 'bg-white border-ink hover:bg-[#FF90E8]/10 hover:shadow-[4px_4px_0px_#111827] hover:-translate-y-1'
+                                    }`}
+                            >
+                                {role === 'employer' && (
+                                    <span className="absolute top-2 right-2 text-[10px] font-black uppercase bg-white border-2 border-ink px-1.5 py-0.5 rounded-md shadow-[2px_2px_0px_#111827]">
+                                        Dipilih
+                                    </span>
+                                )}
+                                <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-3 border-[3px] ${role === 'employer'
+                                        ? 'bg-white border-ink shadow-[2px_2px_0px_#111827]'
+                                        : 'bg-surface-100 border-ink border-dashed text-ink/40'
+                                    }`}>
+                                    <Building2 className={`w-6 h-6 ${role === 'employer' ? 'text-ink' : ''}`} strokeWidth={role === 'employer' ? 3 : 2} />
+                                </div>
+                                <p className={`text-base font-black uppercase ${role === 'employer' ? 'text-ink' : 'text-ink/60'}`}>Bos<br />Besar</p>
+                                <p className={`text-[10px] font-bold mt-1 uppercase ${role === 'employer' ? 'text-ink/80' : 'text-ink/40'}`}>Cari Karyawan</p>
+                                <p className={`text-[10px] mt-1 font-bold ${role === 'employer' ? 'text-ink/80' : 'text-ink/50'}`}>Pasang lowongan dan temukan kandidat satset.</p>
+                            </button>
                         </div>
-                    )}
+                        {errors.role && <p className="text-[11px] font-black text-rose-500 bg-rose-100 border-2 border-rose-300 px-2 py-0.5 rounded-lg inline-block uppercase">{errors.role}</p>}
+                    </div>
 
                     {/* Name field (register only) */}
                     {authTab === 'register' && (

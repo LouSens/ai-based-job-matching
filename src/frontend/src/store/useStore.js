@@ -39,7 +39,7 @@ const useStore = create(
             openAuthModal: (tab = 'login', preferredRole = null) => set({
                 showAuthModal: true,
                 authTab: tab,
-                preferredAuthRole: tab === 'register' ? preferredRole : null,
+                preferredAuthRole: preferredRole,
             }),
 
             /**
@@ -123,7 +123,7 @@ const useStore = create(
                 if (protectedTabs.includes(tab)) {
                     if (!isAuthenticated) {
                         toast('Silakan Masuk untuk mengakses fitur ini', { icon: '🔒', id: 'auth-toast' })
-                        openAuthModal('login')
+                        openAuthModal('login', 'seeker')
                         return
                     }
                     if (userRole !== 'seeker') {
@@ -136,7 +136,7 @@ const useStore = create(
                 if (employerTabs.includes(tab)) {
                     if (!isAuthenticated) {
                         toast('Silakan Masuk sebagai Pemberi Kerja', { icon: '🔒', id: 'auth-toast' })
-                        openAuthModal('login')
+                        openAuthModal('login', 'employer')
                         return
                     }
                     if (userRole !== 'employer') {

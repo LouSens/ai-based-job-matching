@@ -116,8 +116,42 @@ class TestStartupConfiguration:
     """Test application startup wiring."""
 
     @pytest.mark.asyncio
-    async def test_lifespan_reconfigures_database_before_init(self, monkeypatch: pytest.MonkeyPatch) -> None:
-        """Startup should point SQLAlchemy at settings.database_url before table creation."""
+    async def test_lifespan_falls_back_to_sqlite_for_default_dev_database(
+        self,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """Development startup should prefer the SQLite demo DB over the shipped local Postgres default."""
+        calls: list[tuple[str, str]] = []
+
+        def fake_reconfigure(database_url: str) -> None:
+            calls.append(("reconfigure", database_url))
+
+        async def fake_init_db() -> None:
+            calls.append(("init_db", ""))
+
+        def fake_configure_auth(secret_key: str, expire_minutes: int) -> None:
+            calls.append(("configure_auth", secret_key))
+
+        monkeypatch.setattr("src.api.main.reconfigure", fake_reconfigure)
+        monkeypatch.setattr("src.api.main.init_db", fake_init_db)
+        monkeypatch.setattr("src.api.main.configure_auth", fake_configure_auth)
+        monkeypatch.setattr(
+            "src.api.main.settings.database_url",
+            "postgresql://kerja:password@localhost:5432/kerjacerdas",
+        )
+        monkeypatch.setattr("src.api.main.settings.jwt_secret_key", "configured-secret")
+        monkeypatch.setattr("src.api.main.settings.app_env", "development")
+
+        async with app.router.lifespan_context(app):
+            pass
+
+        assert calls[0] == ("reconfigure", "sqlite+aiosqlite:///./kerjacerdas.db")
+        assert calls[1] == ("init_db", "")
+        assert calls[2] == ("configure_auth", "configured-secret")
+
+    @pytest.mark.asyncio
+    async def test_lifespan_honors_explicit_dev_database_url(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        """Development startup should honor custom DB URLs instead of forcing SQLite."""
         calls: list[tuple[str, str]] = []
 
         def fake_reconfigure(database_url: str) -> None:

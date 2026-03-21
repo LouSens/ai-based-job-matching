@@ -17,7 +17,7 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
-from config.settings import settings
+from config.settings import Settings, settings
 from src.api.database import init_db, reconfigure
 from src.api.services.auth_service import configure as configure_auth
 
@@ -28,6 +28,8 @@ from src.api.routers.seeker import router as seeker_router
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+_DEFAULT_DATABASE_URL = Settings.model_fields["database_url"].default
 
 
 # ─── Pydantic Schemas ────────────────────────────────────────────────────────
@@ -268,11 +270,16 @@ MOCK_JOBS = [
 async def lifespan(app: FastAPI):
     """Application startup and shutdown."""
     logger.info("🚀 KerjaCerdas API starting up...")
-    
-    # Configure the DB engine from env before any table creation.
-    reconfigure(settings.database_url)
+
+    # In demo/development, keep the app bootable without a live local Postgres instance.
+    database_url = settings.database_url
+    if not settings.is_production and database_url == _DEFAULT_DATABASE_URL:
+        database_url = "sqlite+aiosqlite:///./kerjacerdas.db"
+
+    logger.info("Startup database selected: %s", database_url)
+    reconfigure(database_url)
     await init_db()
-    
+
     # Configure Auth Service from env; production must provide a stable secret.
     jwt_secret = settings.jwt_secret_key
     if not jwt_secret and settings.is_production:
@@ -288,7 +295,7 @@ async def lifespan(app: FastAPI):
         secret_key=jwt_secret,
         expire_minutes=settings.jwt_access_token_expire_minutes,
     )
-    
+
     # In production: initialize further connections, load ML models, warm up agents
     yield
     logger.info("KerjaCerdas API shutting down...")
