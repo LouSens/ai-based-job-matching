@@ -16,6 +16,7 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
+from config.settings import settings
 from src.api.database import init_db
 from src.api.services.auth_service import configure as configure_auth
 
@@ -270,8 +271,15 @@ async def lifespan(app: FastAPI):
     # Initialize DB (Creates SQLite/Postgres tables)
     await init_db()
     
-    # Configure Auth Service (In production this reads from .env)
-    configure_auth(secret_key="kerjacerdas-dev-secret-change-in-production")
+    # Configure Auth Service from env; fail fast if the secret is missing.
+    jwt_secret = settings.jwt_secret_key
+    if not jwt_secret:
+        raise RuntimeError("JWT_SECRET_KEY must be set")
+
+    configure_auth(
+        secret_key=jwt_secret,
+        expire_minutes=settings.jwt_access_token_expire_minutes,
+    )
     
     # In production: initialize further connections, load ML models, warm up agents
     yield

@@ -28,12 +28,21 @@ The API is built on a **Multi-Agent** architecture:
 ```bash
 python -m venv venv
 source venv/bin/activate  # or venv\Scripts\activate on Windows
-pip install -r requirements.txt
+pip install -e .[dev]
+```
+
+Set `JWT_SECRET_KEY` in your `.env` file before starting the API. Generate a strong value with:
+```bash
+openssl rand -hex 32
+```
+or on PowerShell:
+```powershell
+[Convert]::ToHexString((1..32 | ForEach-Object { Get-Random -Maximum 256 }))
 ```
 
 ### 2. Run Locally
 ```bash
-uvicorn main:app --reload --port 8000
+uvicorn src.api.main:app --reload --port 8000
 ```
 Interactive documentation: `http://localhost:8000/docs`
 

@@ -64,6 +64,15 @@ cp .env.example .env
 # Add your GOOGLE_API_KEY to .env (needed for AI features)
 ```
 
+Set `JWT_SECRET_KEY` in `.env` before you run the API. Use a long random value, for example:
+```bash
+openssl rand -hex 32
+```
+On Windows PowerShell, you can use:
+```powershell
+[Convert]::ToHexString((1..32 | ForEach-Object { Get-Random -Maximum 256 }))
+```
+
 ### 2. Run the Full Stack
 ```bash
 docker-compose up
@@ -72,6 +81,53 @@ docker-compose up
 ### 3. Access the Demo
 - **Frontend**: `http://localhost:3000`
 - **API Docs**: `http://localhost:8000/docs`
+
+### Security TODO
+- The demo stack still uses local-only defaults in `docker-compose.yml`, including exposed service ports, wildcard CORS, and placeholder database credentials. Keep those defaults for hackathon demos only and harden them before any shared or production deployment.
+
+## 🧪 Local Development Setup
+
+Follow these steps when you want to iterate locally without Docker.
+
+### 1. Backend
+- Create and activate a virtual environment: 
+  ```powershell
+  python -m venv .venv
+  .\.venv\Scripts\Activate
+  ```
+- Install the editable backend plus dev extras:
+  ```powershell
+  pip install -e .[dev]
+  ```
+- Copy the example env and keep it up to date (Gemini key only required for advisor demos):
+  ```powershell
+  Copy-Item .env.example .env
+  ```
+- Set `JWT_SECRET_KEY` in `.env` before starting the API. A simple way to generate one in PowerShell is:
+  ```powershell
+  [Convert]::ToHexString((1..32 | ForEach-Object { Get-Random -Maximum 256 }))
+  ```
+- Run the FastAPI unit tests each time you touch API code:
+  ```powershell
+  python -m pytest tests/unit/test_api.py
+  ```
+- To boot the API for manual testing:
+  ```powershell
+  uvicorn src.api.main:app --host 0.0.0.0 --port 8000 --reload --reload-dir src/api --reload-dir config
+  ```
+  (The `--reload-dir` flags keep WatchFiles focused on your source, avoiding noise from `.venv`.)
+
+### 2. Frontend
+- Install dependencies and start Vite from the `src/frontend` folder:
+  ```powershell
+  cd src/frontend
+  npm install
+  npm run dev -- --host 0.0.0.0 --port 5173
+  ```
+- The frontend will talk to the backend at `http://localhost:8000`; confirm the API health at `/health`. 
+
+### 3. Optional helpers
+- If you prefer a narrow watcher, replace the `--reload` command with your editor's restart workflow.
 
 ---
 

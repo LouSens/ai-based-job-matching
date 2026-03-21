@@ -16,9 +16,16 @@ import jwt  # PyJWT
 logger = logging.getLogger(__name__)
 
 # Defaults – overridden by settings at runtime
-_SECRET_KEY = "kerjacerdas-dev-secret-change-in-production"
+_SECRET_KEY: str | None = None
 _ALGORITHM = "HS256"
 _ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24  # 24 hours
+
+
+def _get_secret_key() -> str:
+    """Return the configured signing secret or fail closed."""
+    if not _SECRET_KEY:
+        raise RuntimeError("Auth service has not been configured with a JWT secret key")
+    return _SECRET_KEY
 
 
 def configure(secret_key: str, expire_minutes: int = 60 * 24) -> None:
@@ -30,6 +37,8 @@ def configure(secret_key: str, expire_minutes: int = 60 * 24) -> None:
         expire_minutes: Token lifetime in minutes.
     """
     global _SECRET_KEY, _ACCESS_TOKEN_EXPIRE_MINUTES
+    if not secret_key:
+        raise ValueError("secret_key must be provided")
     _SECRET_KEY = secret_key
     _ACCESS_TOKEN_EXPIRE_MINUTES = expire_minutes
     logger.info("AuthService configured")
@@ -92,7 +101,7 @@ def create_access_token(user_id: str, role: str, name: str, email: str) -> str:
         "exp": expire,
         "iat": datetime.now(timezone.utc),
     }
-    return jwt.encode(payload, _SECRET_KEY, algorithm=_ALGORITHM)
+    return jwt.encode(payload, _get_secret_key(), algorithm=_ALGORITHM)
 
 
 def decode_access_token(token: str) -> dict | None:
@@ -106,7 +115,7 @@ def decode_access_token(token: str) -> dict | None:
         Token payload dict, or None if expired/invalid.
     """
     try:
-        payload = jwt.decode(token, _SECRET_KEY, algorithms=[_ALGORITHM])
+        payload = jwt.decode(token, _get_secret_key(), algorithms=[_ALGORITHM])
         return payload
     except jwt.ExpiredSignatureError:
         logger.warning("Token expired")

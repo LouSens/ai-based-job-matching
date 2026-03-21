@@ -26,6 +26,8 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
     api_host: str = "0.0.0.0"
     api_port: int = 8000
+    jwt_secret_key: str = ""
+    jwt_access_token_expire_minutes: int = 60 * 24
 
     # ── Google Gemini API ────────────────────────────────────────────────
     gemini_api_key: str = ""
@@ -38,6 +40,7 @@ class Settings(BaseSettings):
 
     # ── MLflow ───────────────────────────────────────────────────────────
     mlflow_tracking_uri: str = "http://localhost:5001"
+    vite_api_url: str = "http://localhost:8000"
 
     # ── Agent Configuration ──────────────────────────────────────────────
     orchestrator_temperature: float = 0.2
