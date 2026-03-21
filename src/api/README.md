@@ -31,7 +31,7 @@ source venv/bin/activate  # or venv\Scripts\activate on Windows
 pip install -e .[dev]
 ```
 
-Set `JWT_SECRET_KEY` in your `.env` file before starting the API. Generate a strong value with:
+Set `JWT_SECRET_KEY` in your `.env` file before starting the API in production. In development/demo, the API can generate an ephemeral runtime secret, but tokens will become invalid after restart. Generate a strong value with:
 ```bash
 openssl rand -hex 32
 ```

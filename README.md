@@ -64,7 +64,7 @@ cp .env.example .env
 # Add your GOOGLE_API_KEY to .env (needed for AI features)
 ```
 
-Set `JWT_SECRET_KEY` in `.env` before you run the API. Use a long random value, for example:
+Set `JWT_SECRET_KEY` in `.env` before you run the API in production. In development/demo, the API can fall back to an ephemeral runtime secret, but issued tokens will stop working after restart. Use a long random value for a stable secret, for example:
 ```bash
 openssl rand -hex 32
 ```
@@ -103,7 +103,7 @@ Follow these steps when you want to iterate locally without Docker.
   ```powershell
   Copy-Item .env.example .env
   ```
-- Set `JWT_SECRET_KEY` in `.env` before starting the API. A simple way to generate one in PowerShell is:
+- Set `JWT_SECRET_KEY` in `.env` before starting the API in production. For development/demo it is optional, but using a real value avoids token invalidation after restart. A simple way to generate one in PowerShell is:
   ```powershell
   [Convert]::ToHexString((1..32 | ForEach-Object { Get-Random -Maximum 256 }))
   ```

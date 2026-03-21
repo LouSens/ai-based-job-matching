@@ -72,6 +72,34 @@ export async function listJobs(limit = 20, offset = 0) {
 }
 
 /**
+ * Verify candidate identity via e-KYC.
+ * POST /api/v1/verify/identity
+ */
+export async function verifyIdentity(payload) {
+    const res = await fetch(`${API_BASE}/verify/identity`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+    })
+    if (!res.ok) throw new Error(`Identity verification API error: ${res.status}`)
+    return res.json()
+}
+
+/**
+ * Verify education credentials.
+ * POST /api/v1/verify/education
+ */
+export async function verifyEducation(payload) {
+    const res = await fetch(`${API_BASE}/verify/education`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+    })
+    if (!res.ok) throw new Error(`Education verification API error: ${res.status}`)
+    return res.json()
+}
+
+/**
  * Health check.
  * GET /health
  */

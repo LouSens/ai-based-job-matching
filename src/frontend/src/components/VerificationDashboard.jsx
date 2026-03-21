@@ -1,10 +1,8 @@
 import { useState } from 'react';
 import { ShieldCheck, UserCheck, GraduationCap, ArrowRight, Lock, ServerCrash, CheckCircle2 } from 'lucide-react';
-import useStore from '../store/useStore';
+import { verifyEducation, verifyIdentity } from '../services/api';
 
 export default function VerificationDashboard() {
-    const { user } = useStore();
-    
     const [ekycStatus, setEkycStatus] = useState('unverified'); // 'unverified', 'loading', 'verified', 'failed'
     const [sivilStatus, setSivilStatus] = useState('unverified'); // 'unverified', 'loading', 'verified', 'failed'
     
@@ -18,16 +16,11 @@ export default function VerificationDashboard() {
         e.preventDefault();
         setEkycStatus('loading');
         try {
-            const res = await fetch('http://localhost:8000/api/v1/verify/identity', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    nik: ekycData.nik,
-                    full_name: ekycData.name,
-                    date_of_birth: ekycData.dob
-                })
+            const data = await verifyIdentity({
+                nik: ekycData.nik,
+                full_name: ekycData.name,
+                date_of_birth: ekycData.dob
             });
-            const data = await res.json();
             if (data.status === 'VERIFIED') {
                 setZkCommitment(data.zk_commitment);
                 setEkycStatus('verified');
@@ -43,16 +36,11 @@ export default function VerificationDashboard() {
         e.preventDefault();
         setSivilStatus('loading');
         try {
-            const res = await fetch('http://localhost:8000/api/v1/verify/education', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    ijazah_number: sivilData.ijazah,
-                    university_name: sivilData.university,
-                    major: sivilData.major
-                })
+            const data = await verifyEducation({
+                ijazah_number: sivilData.ijazah,
+                university_name: sivilData.university,
+                major: sivilData.major
             });
-            const data = await res.json();
             if (data.status === 'VERIFIED') {
                 setSivilResult(data.verified_data);
                 setSivilStatus('verified');

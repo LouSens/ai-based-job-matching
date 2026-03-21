@@ -8,6 +8,7 @@ ANTIGRAVITY PROTOCOL: All endpoints must be typed, documented, and logged.
 from __future__ import annotations
 
 import logging
+import secrets
 import time
 import uuid
 from contextlib import asynccontextmanager
@@ -17,7 +18,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 from config.settings import settings
-from src.api.database import init_db
+from src.api.database import init_db, reconfigure
 from src.api.services.auth_service import configure as configure_auth
 
 # Import our new routers
@@ -268,13 +269,20 @@ async def lifespan(app: FastAPI):
     """Application startup and shutdown."""
     logger.info("🚀 KerjaCerdas API starting up...")
     
-    # Initialize DB (Creates SQLite/Postgres tables)
+    # Configure the DB engine from env before any table creation.
+    reconfigure(settings.database_url)
     await init_db()
     
-    # Configure Auth Service from env; fail fast if the secret is missing.
+    # Configure Auth Service from env; production must provide a stable secret.
     jwt_secret = settings.jwt_secret_key
-    if not jwt_secret:
+    if not jwt_secret and settings.is_production:
         raise RuntimeError("JWT_SECRET_KEY must be set")
+    if not jwt_secret:
+        jwt_secret = secrets.token_urlsafe(32)
+        logger.warning(
+            "JWT_SECRET_KEY is not set; using an ephemeral development secret. "
+            "Tokens will be invalid after restart."
+        )
 
     configure_auth(
         secret_key=jwt_secret,

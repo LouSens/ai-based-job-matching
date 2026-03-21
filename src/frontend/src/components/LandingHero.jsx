@@ -9,8 +9,8 @@ import useStore from '../store/useStore'
  */
 
 const ANIMATED_STATS = [
-    { value: 50000, label: 'Lowongan Aktif', suffix: '+', icon: Briefcase },
-    { value: 1200, label: 'Perusahaan Terdaftar', suffix: '+', icon: Building2 },
+    { value: 131, label: 'Lowongan Aktif', suffix: '+', icon: Briefcase },
+    { value: 0, label: 'Perusahaan Terdaftar', suffix: '+', icon: Building2 },
     { value: 87, label: 'Akurasi Matching', suffix: '%', icon: BarChart3 },
     { value: 140, label: 'Response Time (ms)', suffix: 'ms', icon: Clock },
 ]

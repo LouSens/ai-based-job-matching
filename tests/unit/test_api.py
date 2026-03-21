@@ -110,3 +110,81 @@ class TestJobsEndpoint:
         data = response.json()
         assert "jobs" in data
         assert len(data["jobs"]) <= 3
+
+
+class TestStartupConfiguration:
+    """Test application startup wiring."""
+
+    @pytest.mark.asyncio
+    async def test_lifespan_reconfigures_database_before_init(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        """Startup should point SQLAlchemy at settings.database_url before table creation."""
+        calls: list[tuple[str, str]] = []
+
+        def fake_reconfigure(database_url: str) -> None:
+            calls.append(("reconfigure", database_url))
+
+        async def fake_init_db() -> None:
+            calls.append(("init_db", ""))
+
+        def fake_configure_auth(secret_key: str, expire_minutes: int) -> None:
+            calls.append(("configure_auth", secret_key))
+
+        monkeypatch.setattr("src.api.main.reconfigure", fake_reconfigure)
+        monkeypatch.setattr("src.api.main.init_db", fake_init_db)
+        monkeypatch.setattr("src.api.main.configure_auth", fake_configure_auth)
+        monkeypatch.setattr("src.api.main.settings.database_url", "postgresql://example/db")
+        monkeypatch.setattr("src.api.main.settings.jwt_secret_key", "configured-secret")
+        monkeypatch.setattr("src.api.main.settings.app_env", "development")
+
+        async with app.router.lifespan_context(app):
+            pass
+
+        assert calls[0] == ("reconfigure", "postgresql://example/db")
+        assert calls[1] == ("init_db", "")
+        assert calls[2] == ("configure_auth", "configured-secret")
+
+    @pytest.mark.asyncio
+    async def test_lifespan_generates_ephemeral_secret_outside_production(
+        self,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """Development startup should succeed with a generated JWT secret."""
+        captured: dict[str, str] = {}
+
+        def fake_reconfigure(database_url: str) -> None:
+            return None
+
+        async def fake_init_db() -> None:
+            return None
+
+        def fake_configure_auth(secret_key: str, expire_minutes: int) -> None:
+            captured["secret_key"] = secret_key
+
+        monkeypatch.setattr("src.api.main.reconfigure", fake_reconfigure)
+        monkeypatch.setattr("src.api.main.init_db", fake_init_db)
+        monkeypatch.setattr("src.api.main.configure_auth", fake_configure_auth)
+        monkeypatch.setattr("src.api.main.settings.jwt_secret_key", "")
+        monkeypatch.setattr("src.api.main.settings.app_env", "development")
+
+        async with app.router.lifespan_context(app):
+            pass
+
+        assert captured["secret_key"]
+
+    @pytest.mark.asyncio
+    async def test_lifespan_requires_secret_in_production(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        """Production startup should fail fast without a configured JWT secret."""
+        def fake_reconfigure(database_url: str) -> None:
+            return None
+
+        async def fake_init_db() -> None:
+            return None
+
+        monkeypatch.setattr("src.api.main.reconfigure", fake_reconfigure)
+        monkeypatch.setattr("src.api.main.init_db", fake_init_db)
+        monkeypatch.setattr("src.api.main.settings.jwt_secret_key", "")
+        monkeypatch.setattr("src.api.main.settings.app_env", "production")
+
+        with pytest.raises(RuntimeError, match="JWT_SECRET_KEY must be set"):
+            async with app.router.lifespan_context(app):
+                pass
