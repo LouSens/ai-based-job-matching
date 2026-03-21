@@ -38,7 +38,7 @@ export default function Footer() {
                                 { label: 'Cari Pekerjaan', action: () => setActiveTab('match') },
                                 { label: 'Analisis Skill Gap', action: () => setActiveTab('gap') },
                                 { label: 'AI Career Advisor', action: () => setActiveTab('advisor') },
-                                { label: 'Daftar Gratis', action: () => openAuthModal('register') },
+                                { label: 'Daftar Gratis', action: () => openAuthModal('register', 'seeker') },
                             ].map(item => (
                                 <li key={item.label}>
                                     <button
@@ -60,10 +60,10 @@ export default function Footer() {
                         </p>
                         <ul className="space-y-3">
                             {[
-                                { label: 'Pasang Lowongan', action: () => openAuthModal('register') },
-                                { label: 'Cari Kandidat AI', action: () => openAuthModal('register') },
+                                { label: 'Pasang Lowongan', action: () => openAuthModal('register', 'employer') },
+                                { label: 'Cari Kandidat AI', action: () => openAuthModal('register', 'employer') },
                                 { label: 'Kelola Lowongan', action: () => setActiveTab('employer') },
-                                { label: 'Daftar Perusahaan', action: () => openAuthModal('register') },
+                                { label: 'Daftar Perusahaan', action: () => openAuthModal('register', 'employer') },
                             ].map(item => (
                                 <li key={item.label}>
                                     <button

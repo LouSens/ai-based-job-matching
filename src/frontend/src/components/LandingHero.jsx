@@ -207,7 +207,7 @@ export default function LandingHero() {
                         ) : (
                             <>
                                 <button
-                                    onClick={() => openAuthModal('register')}
+                                    onClick={() => openAuthModal('register', 'employer')}
                                     className="btn-glow flex items-center gap-2 text-base px-8 py-4 bg-ink hover:bg-surface-800 text-white shadow-brutal w-full sm:w-auto font-bold"
                                 >
                                     <UserPlus className="w-5 h-5" />
@@ -323,7 +323,7 @@ export default function LandingHero() {
                     <div className="text-center mt-20">
                         {audience === 'seeker' ? (
                             <button
-                                onClick={() => openAuthModal('register')}
+                                onClick={() => openAuthModal('register', 'seeker')}
                                 className="inline-flex items-center gap-3 bg-brand-400 border-[3px] border-ink shadow-[6px_6px_0px_#111827] text-ink font-black uppercase text-lg px-10 py-5 transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[4px_4px_0px_#111827] group"
                             >
                                 Mulai Sekarang — Gratis
@@ -331,7 +331,7 @@ export default function LandingHero() {
                             </button>
                         ) : (
                             <button
-                                onClick={() => openAuthModal('register')}
+                                onClick={() => openAuthModal('register', 'employer')}
                                 className="inline-flex items-center gap-3 bg-ink text-white border-[3px] border-ink shadow-[6px_6px_0px_#FF90E8] font-black uppercase text-lg px-10 py-5 transition-all hover:bg-surface-800 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[4px_4px_0px_#FF90E8] group"
                             >
                                 Daftar Perusahaan Sekarang

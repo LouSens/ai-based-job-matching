@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { X, Mail, Lock, User, Briefcase, Search, Eye, EyeOff, Zap, Building2, UserCheck, Shield } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { X, Mail, Lock, User, Search, Eye, EyeOff, Zap, Building2, UserCheck, Shield } from 'lucide-react'
 import useStore from '../store/useStore'
 
 /**
@@ -8,7 +8,15 @@ import useStore from '../store/useStore'
  * Glassmorphism design with animated transitions.
  */
 export default function AuthModal() {
-    const { showAuthModal, closeAuthModal, authTab, setAuthTab, login, register } = useStore()
+    const {
+        showAuthModal,
+        closeAuthModal,
+        authTab,
+        setAuthTab,
+        preferredAuthRole,
+        login,
+        register,
+    } = useStore()
 
     // Form state
     const [name, setName] = useState('')
@@ -20,8 +28,27 @@ export default function AuthModal() {
     const [agreeTerms, setAgreeTerms] = useState(false)
     const [loading, setLoading] = useState(false)
     const [errors, setErrors] = useState({})
+    const closeBtnRef = useRef(null)
 
-    if (!showAuthModal) return null
+    useEffect(() => {
+        if (!showAuthModal) return undefined
+
+        // Close on Escape and move initial keyboard focus to the close button.
+        const onKeyDown = (event) => {
+            if (event.key === 'Escape') closeAuthModal()
+        }
+
+        window.addEventListener('keydown', onKeyDown)
+        closeBtnRef.current?.focus()
+
+        return () => window.removeEventListener('keydown', onKeyDown)
+    }, [showAuthModal, closeAuthModal])
+
+    useEffect(() => {
+        if (authTab === 'register' && preferredAuthRole && !role) {
+            setRole(preferredAuthRole)
+        }
+    }, [authTab, preferredAuthRole, role])
 
     /**
      * Validates form fields and returns error object.
@@ -39,6 +66,44 @@ export default function AuthModal() {
             if (!agreeTerms) errs.terms = 'Setujui syarat dan ketentuan'
         }
         return errs
+    }
+
+    const clearErrors = (...keys) => {
+        setErrors((prev) => {
+            let changed = false
+            const next = { ...prev }
+            keys.forEach((key) => {
+                if (next[key]) {
+                    delete next[key]
+                    changed = true
+                }
+            })
+            return changed ? next : prev
+        })
+    }
+
+    const selectRole = (nextRole) => {
+        setRole(nextRole)
+        clearErrors('role')
+    }
+
+    const handleRoleKeyDown = (event, currentRole) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault()
+            selectRole(currentRole)
+            return
+        }
+
+        if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+            event.preventDefault()
+            selectRole(currentRole === 'seeker' ? 'employer' : 'seeker')
+            return
+        }
+
+        if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+            event.preventDefault()
+            selectRole(currentRole === 'seeker' ? 'employer' : 'seeker')
+        }
     }
 
     /**
@@ -79,6 +144,8 @@ export default function AuthModal() {
         setErrors({})
     }
 
+    if (!showAuthModal) return null
+
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
             {/* Backdrop */}
@@ -88,9 +155,15 @@ export default function AuthModal() {
             />
 
             {/* Modal */}
-            <div className="relative w-full max-w-md bg-white border-[3px] border-ink rounded-[2rem] shadow-[8px_8px_0px_#111827] animate-scale-in overflow-y-auto max-h-[90vh]">
+            <div
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="auth-modal-title"
+                className="relative w-full max-w-md bg-white border-[3px] border-ink rounded-[2rem] shadow-[8px_8px_0px_#111827] animate-scale-in overflow-y-auto max-h-[90vh]"
+            >
                 {/* Close button */}
                 <button
+                    ref={closeBtnRef}
                     onClick={closeAuthModal}
                     className="absolute top-4 right-4 p-2 rounded-xl bg-rose-400 border-[3px] border-ink hover:bg-rose-500 text-ink shadow-[2px_2px_0px_#111827] hover:shadow-[4px_4px_0px_#111827] hover:-translate-y-0.5 transition-all z-10"
                     aria-label="Tutup modal"
@@ -103,7 +176,7 @@ export default function AuthModal() {
                     <div className="w-16 h-16 rounded-2xl bg-[#FFC900] border-[3px] border-ink flex items-center justify-center mx-auto mb-5 shadow-[4px_4px_0px_#111827] transform -rotate-3 hover:rotate-3 transition-transform">
                         <Zap className="w-8 h-8 text-ink fill-current" strokeWidth={2} />
                     </div>
-                    <h2 className="text-3xl font-black text-ink uppercase tracking-tight">
+                    <h2 id="auth-modal-title" className="text-3xl font-black text-ink uppercase tracking-tight">
                         {authTab === 'login' ? 'Masuk ' : 'Daftar '}<br />
                         <span className="inline-block bg-[#00E5FF] border-[3px] border-ink px-3 py-1 shadow-[4px_4px_0px_#111827] transform rotate-2 mt-2">KerjaCerdas</span>
                     </h2>
@@ -139,20 +212,35 @@ export default function AuthModal() {
                     {/* Role selection (register only) */}
                     {authTab === 'register' && (
                         <div className="space-y-3">
-                            <label className="text-xs font-black uppercase tracking-widest text-ink flex items-center gap-2">
+                            <label id="role-label" className="text-xs font-black uppercase tracking-widest text-ink flex items-center gap-2">
                                 <UserCheck className="w-5 h-5 text-ink" strokeWidth={3} />
                                 Saya adalah... <span className="text-red-500 font-extrabold">*</span>
                             </label>
-                            <div className="grid grid-cols-2 gap-4">
+                            <p className="text-[11px] font-bold text-ink/60 uppercase tracking-wide">Pilih peran dulu, biar form langsung nyambung boss.</p>
+                            <div
+                                role="radiogroup"
+                                aria-labelledby="role-label"
+                                aria-invalid={Boolean(errors.role)}
+                                className="grid grid-cols-2 gap-4"
+                            >
                                 {/* Seeker role */}
                                 <button
                                     type="button"
-                                    onClick={() => setRole('seeker')}
+                                    role="radio"
+                                    aria-checked={role === 'seeker'}
+                                    tabIndex={role === 'employer' ? -1 : 0}
+                                    onClick={() => selectRole('seeker')}
+                                    onKeyDown={(e) => handleRoleKeyDown(e, 'seeker')}
                                     className={`relative p-5 rounded-2xl border-[3px] text-left transition-all duration-200 ${role === 'seeker'
                                             ? 'bg-[#00E5FF] border-ink shadow-[4px_4px_0px_#111827] transform -rotate-1'
                                             : 'bg-white border-ink hover:bg-[#00E5FF]/10 hover:shadow-[4px_4px_0px_#111827] hover:-translate-y-1'
                                         }`}
                                 >
+                                    {role === 'seeker' && (
+                                        <span className="absolute top-2 right-2 text-[10px] font-black uppercase bg-white border-2 border-ink px-1.5 py-0.5 rounded-md shadow-[2px_2px_0px_#111827]">
+                                            Dipilih
+                                        </span>
+                                    )}
                                     <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-3 border-[3px] ${role === 'seeker'
                                             ? 'bg-white border-ink shadow-[2px_2px_0px_#111827]'
                                             : 'bg-surface-100 border-ink border-dashed text-ink/40'
@@ -161,17 +249,27 @@ export default function AuthModal() {
                                     </div>
                                     <p className={`text-base font-black uppercase ${role === 'seeker' ? 'text-ink' : 'text-ink/60'}`}>Pejuang<br />Kerja</p>
                                     <p className={`text-[10px] font-bold mt-1 uppercase ${role === 'seeker' ? 'text-ink/80' : 'text-ink/40'}`}>Cari Duit</p>
+                                    <p className={`text-[10px] mt-1 font-bold ${role === 'seeker' ? 'text-ink/80' : 'text-ink/50'}`}>Biar AI bantu cari lowongan yang cocok.</p>
                                 </button>
 
                                 {/* Employer role */}
                                 <button
                                     type="button"
-                                    onClick={() => setRole('employer')}
+                                    role="radio"
+                                    aria-checked={role === 'employer'}
+                                    tabIndex={role === 'seeker' ? -1 : 0}
+                                    onClick={() => selectRole('employer')}
+                                    onKeyDown={(e) => handleRoleKeyDown(e, 'employer')}
                                     className={`relative p-5 rounded-2xl border-[3px] text-left transition-all duration-200 ${role === 'employer'
                                             ? 'bg-[#FF90E8] border-ink shadow-[4px_4px_0px_#111827] transform rotate-1'
                                             : 'bg-white border-ink hover:bg-[#FF90E8]/10 hover:shadow-[4px_4px_0px_#111827] hover:-translate-y-1'
                                         }`}
                                 >
+                                    {role === 'employer' && (
+                                        <span className="absolute top-2 right-2 text-[10px] font-black uppercase bg-white border-2 border-ink px-1.5 py-0.5 rounded-md shadow-[2px_2px_0px_#111827]">
+                                            Dipilih
+                                        </span>
+                                    )}
                                     <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-3 border-[3px] ${role === 'employer'
                                             ? 'bg-white border-ink shadow-[2px_2px_0px_#111827]'
                                             : 'bg-surface-100 border-ink border-dashed text-ink/40'
@@ -180,6 +278,7 @@ export default function AuthModal() {
                                     </div>
                                     <p className={`text-base font-black uppercase ${role === 'employer' ? 'text-ink' : 'text-ink/60'}`}>Bos<br />Besar</p>
                                     <p className={`text-[10px] font-bold mt-1 uppercase ${role === 'employer' ? 'text-ink/80' : 'text-ink/40'}`}>Cari Karyawan</p>
+                                    <p className={`text-[10px] mt-1 font-bold ${role === 'employer' ? 'text-ink/80' : 'text-ink/50'}`}>Pasang lowongan dan temukan kandidat satset.</p>
                                 </button>
                             </div>
                             {errors.role && <p className="text-[11px] font-black text-rose-500 bg-rose-100 border-2 border-rose-300 px-2 py-0.5 rounded-lg inline-block uppercase">{errors.role}</p>}
@@ -196,8 +295,12 @@ export default function AuthModal() {
                             <input
                                 type="text"
                                 value={name}
-                                onChange={(e) => setName(e.target.value)}
+                                onChange={(e) => {
+                                    setName(e.target.value)
+                                    clearErrors('name')
+                                }}
                                 placeholder={role === 'employer' ? 'PT Sukses Maju' : 'Budi Santoso'}
+                                aria-invalid={Boolean(errors.name)}
                                 className="w-full px-5 py-3.5 rounded-xl bg-surface-50 border-[3px] border-ink text-base font-bold text-ink placeholder:text-ink/40 focus:bg-white focus:shadow-[4px_4px_0px_#111827] focus:-translate-y-0.5 outline-none transition-all"
                             />
                             {errors.name && <p className="text-[11px] font-black text-rose-500 bg-rose-100 border-2 border-rose-300 px-2 py-0.5 rounded-lg inline-block uppercase mt-1">{errors.name}</p>}
@@ -213,8 +316,12 @@ export default function AuthModal() {
                         <input
                             type="email"
                             value={email}
-                            onChange={(e) => setEmail(e.target.value)}
+                            onChange={(e) => {
+                                setEmail(e.target.value)
+                                clearErrors('email')
+                            }}
                             placeholder="budi@email.com"
+                            aria-invalid={Boolean(errors.email)}
                             className="w-full px-5 py-3.5 rounded-xl bg-surface-50 border-[3px] border-ink text-base font-bold text-ink placeholder:text-ink/40 focus:bg-white focus:shadow-[4px_4px_0px_#111827] focus:-translate-y-0.5 outline-none transition-all"
                         />
                         {errors.email && <p className="text-[11px] font-black text-rose-500 bg-rose-100 border-2 border-rose-300 px-2 py-0.5 rounded-lg inline-block uppercase mt-1">{errors.email}</p>}
@@ -230,8 +337,12 @@ export default function AuthModal() {
                             <input
                                 type={showPassword ? 'text' : 'password'}
                                 value={password}
-                                onChange={(e) => setPassword(e.target.value)}
+                                onChange={(e) => {
+                                    setPassword(e.target.value)
+                                    clearErrors('password', 'confirmPassword')
+                                }}
                                 placeholder="Min. 6 karakter rahasia"
+                                aria-invalid={Boolean(errors.password)}
                                 className="w-full px-5 py-3.5 pr-14 rounded-xl bg-surface-50 border-[3px] border-ink text-base font-bold text-ink placeholder:text-ink/40 focus:bg-white focus:shadow-[4px_4px_0px_#111827] focus:-translate-y-0.5 outline-none transition-all"
                             />
                             <button
@@ -242,6 +353,7 @@ export default function AuthModal() {
                                 {showPassword ? <EyeOff className="w-4 h-4 text-ink" strokeWidth={3} /> : <Eye className="w-4 h-4 text-ink" strokeWidth={3} />}
                             </button>
                         </div>
+                        <p className="text-[11px] font-bold text-ink/50">Tip: pakai kombinasi huruf, angka, dan simbol biar akunmu makin aman.</p>
                         {errors.password && <p className="text-[11px] font-black text-rose-500 bg-rose-100 border-2 border-rose-300 px-2 py-0.5 rounded-lg inline-block uppercase mt-1">{errors.password}</p>}
                     </div>
 
@@ -255,8 +367,12 @@ export default function AuthModal() {
                             <input
                                 type="password"
                                 value={confirmPassword}
-                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                onChange={(e) => {
+                                    setConfirmPassword(e.target.value)
+                                    clearErrors('confirmPassword')
+                                }}
                                 placeholder="Ketik ulang bossku"
+                                aria-invalid={Boolean(errors.confirmPassword)}
                                 className="w-full px-5 py-3.5 rounded-xl bg-surface-50 border-[3px] border-ink text-base font-bold text-ink placeholder:text-ink/40 focus:bg-white focus:shadow-[4px_4px_0px_#111827] focus:-translate-y-0.5 outline-none transition-all"
                             />
                             {errors.confirmPassword && <p className="text-[11px] font-black text-rose-500 bg-rose-100 border-2 border-rose-300 px-2 py-0.5 rounded-lg inline-block uppercase mt-1">{errors.confirmPassword}</p>}
@@ -270,7 +386,10 @@ export default function AuthModal() {
                                 type="checkbox"
                                 id="agreeTerms"
                                 checked={agreeTerms}
-                                onChange={(e) => setAgreeTerms(e.target.checked)}
+                                onChange={(e) => {
+                                    setAgreeTerms(e.target.checked)
+                                    clearErrors('terms')
+                                }}
                                 className="mt-1 w-5 h-5 rounded hover:bg-surface-50 transition-colors border-[3px] border-ink outline-none checked:bg-[#00E5FF] accent-[#00E5FF]"
                             />
                             <label htmlFor="agreeTerms" className="text-xs font-bold text-ink leading-relaxed cursor-pointer select-none">

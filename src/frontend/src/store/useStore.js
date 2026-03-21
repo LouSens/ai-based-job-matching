@@ -22,6 +22,7 @@ const useStore = create(
             isAuthenticated: false,
             showAuthModal: false,
             authTab: 'login', // 'login' | 'register'
+            preferredAuthRole: null, // 'seeker' | 'employer' | null
 
             user: {
                 id: null,
@@ -35,12 +36,16 @@ const useStore = create(
             /**
              * Opens the authentication modal.
              */
-            openAuthModal: (tab = 'login') => set({ showAuthModal: true, authTab: tab }),
+            openAuthModal: (tab = 'login', preferredRole = null) => set({
+                showAuthModal: true,
+                authTab: tab,
+                preferredAuthRole: tab === 'register' ? preferredRole : null,
+            }),
 
             /**
              * Closes the authentication modal.
              */
-            closeAuthModal: () => set({ showAuthModal: false }),
+            closeAuthModal: () => set({ showAuthModal: false, preferredAuthRole: null }),
 
             /**
              * Switches between login and register tabs.

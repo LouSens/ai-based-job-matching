@@ -126,7 +126,7 @@ export default function Header() {
                                         Masuk
                                     </button>
                                     <button
-                                        onClick={() => openAuthModal('register')}
+                                        onClick={() => openAuthModal('register', 'seeker')}
                                         className="bg-[#00E5FF] text-ink text-sm font-black px-5 py-2.5 rounded-xl border-[2px] border-ink shadow-[2px_2px_0px_#111827] hover:shadow-[4px_4px_0px_#111827] hover:-translate-y-1 transition-all flex items-center gap-2"
                                     >
                                         Daftar Gratis
@@ -250,7 +250,7 @@ export default function Header() {
                     {!isAuthenticated ? (
                         <div className="flex flex-col gap-3">
                             <button
-                                onClick={() => { openAuthModal('register'); setMobileMenuOpen(false) }}
+                                onClick={() => { openAuthModal('register', 'seeker'); setMobileMenuOpen(false) }}
                                 className="w-full bg-brand-600 px-4 py-3.5 rounded-xl text-base font-semibold text-white shadow-md hover:bg-brand-700 transition-colors flex items-center justify-center gap-2"
                             >
                                 <UserPlus className="w-5 h-5" strokeWidth={2.5} /> Daftar Gratis
