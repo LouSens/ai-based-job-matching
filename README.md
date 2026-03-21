@@ -3,7 +3,7 @@
 > **Hackathon 2026 Proof of Concept**
 > *Bridging Indonesia's skill gap through semantic AI*
 
-![KerjaCerdas Hero](kerjacerdas_hero_1773485382076.png)
+![KerjaCerdas Hero](Kerjacerdas_Hero.png)
 
 ## 📌 Vision
 Indonesia faces a significant labor challenge: **7.9 million unemployed** (BPS, 2025) and a **62% skill mismatch** among graduates. Traditional job portals rely on keyword matching, which fails to capture the nuance of talent.
