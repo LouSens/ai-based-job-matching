@@ -66,7 +66,7 @@ Kami **tidak** menjual data pribadi Anda kepada pihak ketiga.`,
 • **Akses terbatas**: Hanya personel yang berwenang yang dapat mengakses data pribadi
 • **Audit keamanan**: Kami melakukan audit keamanan berkala dan penetration testing
 • **Backup terenkripsi**: Data di-backup secara berkala dengan enkripsi AES-256
-• **Blockchain verification**: Verifikasi kredensial skill menggunakan teknologi blockchain Ethereum
+• **Verifikasi Identitas**: Bekerja sama dengan Penyelenggara Sertifikasi Elektronik (PSrE) resmi untuk proses e-KYC
 • **Data residency**: Data disimpan di server yang berlokasi di Indonesia sesuai dengan UU PDP
 
 Untuk model AI kami:
@@ -173,34 +173,34 @@ export default function PrivacyPolicyPage() {
                 <div className="max-w-4xl mx-auto px-4 sm:px-6 py-12">
                     <button
                         onClick={() => setActiveTab('home')}
-                        className="flex items-center gap-1.5 text-xs text-surface-400 hover:text-white mb-6 transition-colors"
+                        className="flex items-center gap-1.5 text-xs font-bold text-ink/60 hover:text-ink mb-8 transition-colors bg-white border-2 border-ink px-4 py-2 rounded-xl shadow-[2px_2px_0px_#111827] hover:shadow-[4px_4px_0px_#111827] hover:-translate-y-0.5 inline-flex"
                     >
-                        <ArrowLeft className="w-3.5 h-3.5" />
+                        <ArrowLeft className="w-4 h-4" strokeWidth={3} />
                         Kembali ke Beranda
                     </button>
 
-                    <div className="flex items-center gap-3 mb-4">
-                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-brand-500/20 to-cyan-500/20 border border-brand-500/20 flex items-center justify-center">
-                            <Shield className="w-6 h-6 text-brand-400" />
+                    <div className="flex items-center gap-4 mb-6">
+                        <div className="w-16 h-16 rounded-2xl bg-[#FF90E8] border-[3px] border-ink flex items-center justify-center shadow-[4px_4px_0px_#111827] transform -rotate-3">
+                            <Shield className="w-8 h-8 text-ink" strokeWidth={3} />
                         </div>
                         <div>
-                            <h1 className="text-2xl sm:text-3xl font-extrabold">
-                                Kebijakan Privasi & <span className="gradient-text">Syarat Ketentuan</span>
+                            <h1 className="text-3xl sm:text-4xl font-extrabold text-ink uppercase tracking-tight">
+                                Kebijakan <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-cyan-600">Privasi</span>
                             </h1>
                         </div>
                     </div>
-                    <p className="text-sm text-surface-400 max-w-2xl leading-relaxed">
+                    <p className="text-base font-bold text-ink/70 max-w-2xl leading-relaxed">
                         Transparansi dalam pengelolaan data untuk pencari kerja dan pemberi kerja.
                         Sesuai dengan UU Pelindungan Data Pribadi (UU PDP) No. 27 Tahun 2022.
                     </p>
 
                     {/* Quick nav */}
-                    <div className="flex flex-wrap gap-2 mt-6">
+                    <div className="flex flex-wrap gap-2 mt-8">
                         {SECTIONS.map(({ id, title }) => (
                             <a
                                 key={id}
                                 href={`#privacy-${id}`}
-                                className="px-3 py-1.5 rounded-lg bg-white/[0.04] border border-white/[0.06] text-[11px] font-medium text-surface-400 hover:bg-white/[0.08] hover:text-white hover:border-brand-500/20 transition-all"
+                                className="px-4 py-2 rounded-xl bg-white border-[2px] border-ink text-xs font-black text-ink hover:bg-[#B8FF6D] hover:-translate-y-1 hover:shadow-[4px_4px_0px_#111827] transition-all uppercase tracking-wider"
                             >
                                 {title}
                             </a>
@@ -210,30 +210,30 @@ export default function PrivacyPolicyPage() {
             </div>
 
             {/* Content */}
-            <div className="max-w-4xl mx-auto px-4 sm:px-6 py-10 space-y-6">
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 py-10 space-y-8 relative z-10">
                 {SECTIONS.map(({ id, icon: Icon, title, content }, i) => (
                     <section
                         key={id}
                         id={`privacy-${id}`}
-                        className="glass-card p-6 sm:p-8 scroll-mt-28 animate-slide-up"
-                        style={{ animationDelay: `${i * 80}ms`, animationFillMode: 'backwards' }}
+                        className="bg-white border-[3px] border-ink rounded-[2rem] p-6 sm:p-8 shadow-[8px_8px_0px_#111827] scroll-mt-28"
                     >
-                        <div className="flex items-center gap-3 mb-4">
-                            <div className="w-9 h-9 rounded-xl bg-brand-500/10 border border-brand-500/20 flex items-center justify-center shrink-0">
-                                <Icon className="w-4 h-4 text-brand-400" />
+                        <div className="flex items-center gap-4 mb-6">
+                            <div className="w-12 h-12 rounded-xl bg-[#00E5FF] border-[3px] border-ink flex items-center justify-center shrink-0 shadow-[4px_4px_0px_#111827]">
+                                <Icon className="w-6 h-6 text-ink" strokeWidth={3} />
                             </div>
-                            <h2 className="text-lg font-bold">{title}</h2>
+                            <h2 className="text-xl sm:text-2xl font-black text-ink">{title}</h2>
                         </div>
-                        <div className="text-sm text-surface-300 leading-relaxed whitespace-pre-line prose-headings:font-bold prose-headings:text-white">
+                        <div className="text-base text-ink/80 leading-relaxed font-medium">
                             {content.split('\n').map((line, li) => {
                                 // Bold text rendering
                                 const parts = line.split(/\*\*(.*?)\*\*/g)
                                 return (
-                                    <p key={li} className={line.startsWith('•') ? 'pl-4 py-0.5' : 'py-1'}>
+                                    <p key={li} className={line.startsWith('•') ? 'pl-5 relative mb-2' : 'mb-4'}>
+                                        {line.startsWith('•') && <span className="absolute left-0 text-brand-500 font-bold">•</span>}
                                         {parts.map((part, pi) =>
                                             pi % 2 === 1
-                                                ? <strong key={pi} className="text-white font-semibold">{part}</strong>
-                                                : <span key={pi}>{part}</span>
+                                                ? <strong key={pi} className="text-ink font-black">{part}</strong>
+                                                : <span key={pi}>{part.replace(/^• /g, '')}</span>
                                         )}
                                     </p>
                                 )
@@ -243,13 +243,13 @@ export default function PrivacyPolicyPage() {
                 ))}
 
                 {/* Bottom CTA */}
-                <div className="text-center py-8">
-                    <p className="text-xs text-surface-500 mb-4">
+                <div className="text-center py-12 relative z-10">
+                    <p className="text-sm font-bold text-ink/70 mb-6 max-w-lg mx-auto">
                         Dengan menggunakan KerjaCerdas, Anda menyetujui kebijakan privasi dan syarat ketentuan ini.
                     </p>
                     <button
                         onClick={() => setActiveTab('home')}
-                        className="btn-glow text-sm px-6 py-3"
+                        className="bg-[#FFC900] text-ink border-[3px] border-ink font-black px-8 py-4 rounded-xl shadow-[4px_4px_0px_#111827] hover:-translate-y-1 hover:shadow-[8px_8px_0px_#111827] transition-all"
                     >
                         Kembali ke Beranda
                     </button>

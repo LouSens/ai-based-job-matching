@@ -22,6 +22,7 @@ const useStore = create(
             isAuthenticated: false,
             showAuthModal: false,
             authTab: 'login', // 'login' | 'register'
+            preferredAuthRole: null, // 'seeker' | 'employer' | null
 
             user: {
                 id: null,
@@ -35,12 +36,16 @@ const useStore = create(
             /**
              * Opens the authentication modal.
              */
-            openAuthModal: (tab = 'login') => set({ showAuthModal: true, authTab: tab }),
+            openAuthModal: (tab = 'login', preferredRole = null) => set({
+                showAuthModal: true,
+                authTab: tab,
+                preferredAuthRole: preferredRole,
+            }),
 
             /**
              * Closes the authentication modal.
              */
-            closeAuthModal: () => set({ showAuthModal: false }),
+            closeAuthModal: () => set({ showAuthModal: false, preferredAuthRole: null }),
 
             /**
              * Switches between login and register tabs.
@@ -107,7 +112,41 @@ const useStore = create(
             // ══════════════════════════════════════════════════════════════════
 
             activeTab: 'home',
-            setActiveTab: (tab) => set({ activeTab: tab }),
+            setActiveTab: (tab) => {
+                const state = get()
+                const { isAuthenticated, userRole, openAuthModal } = state
+
+                const protectedTabs = ['match', 'gap', 'dashboard', 'saved', 'verification', 'advisor']
+                const employerTabs = ['employer']
+
+                // Protect seeker features
+                if (protectedTabs.includes(tab)) {
+                    if (!isAuthenticated) {
+                        toast('Silakan Masuk untuk mengakses fitur ini', { icon: '🔒', id: 'auth-toast' })
+                        openAuthModal('login', 'seeker')
+                        return
+                    }
+                    if (userRole !== 'seeker') {
+                        toast.error('Akses Ditolak: Fitur ini khusus untuk Pencari Kerja')
+                        return
+                    }
+                }
+
+                // Protect employer features
+                if (employerTabs.includes(tab)) {
+                    if (!isAuthenticated) {
+                        toast('Silakan Masuk sebagai Pemberi Kerja', { icon: '🔒', id: 'auth-toast' })
+                        openAuthModal('login', 'employer')
+                        return
+                    }
+                    if (userRole !== 'employer') {
+                        toast.error('Akses Ditolak: Fitur ini khusus untuk Pemberi Kerja')
+                        return
+                    }
+                }
+
+                set({ activeTab: tab })
+            },
 
             // ══════════════════════════════════════════════════════════════════
             //  SEEKER PROFILE

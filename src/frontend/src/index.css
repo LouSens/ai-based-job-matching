@@ -14,9 +14,10 @@
   }
 
   body {
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    @apply bg-surface-50 text-ink;
   }
 
   /* Custom scrollbar */
@@ -27,226 +28,194 @@
     background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    background: rgba(100, 116, 139, 0.3);
+    background: theme('colors.surface.300');
     border-radius: 3px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: rgba(100, 116, 139, 0.5);
+    background: theme('colors.surface.400');
   }
 
   /* Selection color */
   ::selection {
-    background: rgba(51, 102, 255, 0.3);
-    color: #fff;
+    @apply bg-brand-500 text-white;
   }
 }
 
 @layer components {
-  /* ─── Glass Card Effect ─────────────────────────────────────────── */
+  /* ─── Bento Card Effect ─────────────────────────────────────────── */
   .glass-card {
-    @apply bg-white/[0.04] backdrop-blur-xl border border-white/[0.08] rounded-2xl;
+    @apply bg-white border-2 border-surface-200 rounded-2xl shadow-sm;
   }
 
   .glass-card-hover {
-    @apply bg-white/[0.04] backdrop-blur-xl border border-white/[0.08] rounded-2xl
+    @apply bg-white border-2 border-surface-200 rounded-2xl shadow-sm
            transition-all duration-300 ease-out
-           hover:bg-white/[0.07] hover:border-white/[0.15] hover:shadow-xl hover:shadow-brand-500/[0.05]
-           hover:-translate-y-0.5;
+           hover:border-ink hover:shadow-brutal hover:-translate-y-1;
   }
 
   /* ─── Gradient Text ─────────────────────────────────────────────── */
   .gradient-text {
-    @apply bg-gradient-to-r from-brand-400 via-blue-400 to-cyan-400 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-brand-600 to-brand-400 bg-clip-text text-transparent font-extrabold;
   }
 
   .gradient-text-warm {
-    @apply bg-gradient-to-r from-amber-400 via-orange-400 to-red-400 bg-clip-text text-transparent;
+    @apply text-brand-500 font-bold;
   }
 
-  /* ─── Glow Button ───────────────────────────────────────────────── */
+  /* ─── Primary Button ───────────────────────────────────────────────── */
   .btn-glow {
-    @apply relative overflow-hidden bg-gradient-to-r from-brand-500 to-brand-600
-           text-white font-semibold rounded-xl px-6 py-3
-           transition-all duration-300 ease-out
-           hover:shadow-[0_0_30px_rgba(51,102,255,0.4)]
-           hover:scale-[1.02] active:scale-[0.98];
-  }
-
-  .btn-glow::before {
-    content: '';
-    @apply absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0
-           translate-x-[-100%] transition-transform duration-500;
-  }
-
-  .btn-glow:hover::before {
-    @apply translate-x-[100%];
+    @apply relative overflow-hidden bg-brand-500
+           text-white font-bold rounded-xl px-6 py-3 border-2 border-transparent
+           transition-all duration-200 ease-in-out
+           hover:bg-brand-600 hover:shadow-brutal hover:-translate-y-0.5 hover:border-ink
+           active:shadow-none active:translate-y-0;
   }
 
   /* ─── Secondary Button ──────────────────────────────────────────── */
   .btn-outline {
-    @apply px-5 py-2.5 rounded-xl text-sm font-medium
-           border border-white/[0.12] text-surface-300
-           transition-all duration-200
-           hover:bg-white/[0.06] hover:border-brand-500/30 hover:text-white
-           active:scale-[0.98];
+    @apply px-5 py-2.5 rounded-xl text-sm font-bold
+           border-2 border-surface-300 text-ink bg-white
+           transition-all duration-200 shadow-sm
+           hover:border-ink hover:shadow-brutal hover:-translate-y-0.5
+           active:shadow-none active:translate-y-0;
   }
 
   /* ─── Ghost Button ──────────────────────────────────────────────── */
   .btn-ghost {
-    @apply px-4 py-2 rounded-lg text-sm font-medium text-surface-400
-           transition-all duration-200
-           hover:bg-white/[0.06] hover:text-white;
+    @apply px-4 py-2 rounded-xl text-sm font-semibold text-surface-600 bg-transparent
+           transition-all duration-200 border-2 border-transparent
+           hover:bg-surface-100 hover:text-ink hover:border-surface-200;
   }
 
   /* ─── Input Field ───────────────────────────────────────────────── */
   .input-dark {
-    @apply w-full bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3
-           text-white placeholder-surface-500 outline-none
+    @apply w-full bg-white border-2 border-surface-200 rounded-xl px-4 py-3
+           text-ink placeholder-surface-400 shadow-sm outline-none
            transition-all duration-200
-           focus:border-brand-500/50 focus:ring-2 focus:ring-brand-500/20 focus:bg-white/[0.07];
+           focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 focus:shadow-brutal-sm;
   }
 
   /* ─── Skill Tags ────────────────────────────────────────────────── */
   .skill-tag {
-    @apply inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium
-           bg-brand-500/15 text-brand-300 border border-brand-500/20
+    @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold
+           bg-surface-100 text-surface-600 border-2 border-surface-200
            transition-all duration-150;
   }
 
   .skill-tag-missing {
-    @apply inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium
-           bg-amber-500/15 text-amber-300 border border-amber-500/20;
+    @apply skill-tag bg-brand-50 text-brand-600 border-brand-200;
   }
 
   .skill-tag-matched {
-    @apply inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium
-           bg-emerald-500/15 text-emerald-300 border border-emerald-500/20;
+    @apply skill-tag bg-emerald-50 text-emerald-700 border-emerald-200;
   }
 
   .skill-tag-interactive {
-    @apply inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-medium
-           border cursor-pointer transition-all duration-200
-           select-none;
+    @apply skill-tag cursor-pointer hover:border-ink hover:text-ink hover:shadow-brutal-sm hover:-translate-y-0.5 select-none;
   }
 
   /* ─── Score Ring ─────────────────────────────────────────────────── */
   .score-ring {
     @apply relative w-14 h-14 rounded-full flex items-center justify-center
-           text-sm font-bold;
+           text-sm font-bold shadow-sm;
     background: conic-gradient(
-      var(--ring-color, #3366ff) calc(var(--score, 0) * 1%),
-      rgba(255, 255, 255, 0.05) 0
+      var(--ring-color, theme('colors.brand.500')) calc(var(--score, 0) * 1%),
+      theme('colors.surface.200') 0
     );
   }
 
   .score-ring::after {
     content: '';
-    @apply absolute inset-[3px] rounded-full bg-surface-900;
+    @apply absolute inset-[4px] rounded-full bg-white shadow-inner;
   }
 
   .score-ring span {
-    @apply relative z-10;
+    @apply relative z-10 text-ink;
   }
 
   /* ─── Tab Buttons ───────────────────────────────────────────────── */
   .tab-btn {
-    @apply relative px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200
-           text-surface-400 hover:text-white hover:bg-white/[0.05];
+    @apply relative px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-200
+           text-surface-500 border-2 border-transparent
+           hover:text-ink hover:bg-surface-100;
   }
 
   .tab-btn.active {
-    @apply text-white bg-white/[0.08] shadow-lg;
-  }
-
-  .tab-btn.active::after {
-    content: '';
-    @apply absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-0.5
-           bg-gradient-to-r from-brand-400 to-cyan-400 rounded-full;
+    @apply text-brand-600 bg-brand-50 border-brand-200 shadow-sm pointer-events-none;
   }
 
   /* ─── Feature Card ──────────────────────────────────────────────── */
   .feature-card {
-    @apply relative bg-white/[0.03] backdrop-blur-xl border border-white/[0.06] rounded-2xl p-6
-           transition-all duration-500 ease-out overflow-hidden;
-  }
-
-  .feature-card::before {
-    content: '';
-    @apply absolute inset-0 bg-gradient-to-br from-brand-500/[0.05] to-transparent
-           opacity-0 transition-opacity duration-500;
-  }
-
-  .feature-card:hover::before {
-    @apply opacity-100;
+    @apply relative bg-white border-2 border-surface-200 rounded-2xl p-6
+           transition-all duration-300 ease-out overflow-hidden shadow-sm;
   }
 
   .feature-card:hover {
-    @apply border-brand-500/20 shadow-xl shadow-brand-500/[0.08] -translate-y-1;
+    @apply border-ink shadow-brutal -translate-y-1;
   }
 
   /* ─── Stat Card ─────────────────────────────────────────────────── */
   .stat-card {
-    @apply text-center p-5 rounded-2xl bg-white/[0.03] border border-white/[0.06]
+    @apply text-center p-6 rounded-2xl bg-white border-2 border-surface-200 shadow-sm
            transition-all duration-300
-           hover:bg-white/[0.06] hover:border-brand-500/20;
+           hover:border-ink hover:shadow-brutal hover:-translate-y-1;
   }
 
   /* ─── Badge ─────────────────────────────────────────────────────── */
   .badge {
-    @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold
-           tracking-wide uppercase;
+    @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-extrabold
+           tracking-widest uppercase border-2 shadow-sm;
   }
 
   .badge-brand {
-    @apply badge bg-brand-500/15 text-brand-300 border border-brand-500/20;
+    @apply badge bg-brand-50 text-brand-600 border-brand-200;
   }
 
   .badge-success {
-    @apply badge bg-emerald-500/15 text-emerald-300 border border-emerald-500/20;
+    @apply badge bg-emerald-50 text-emerald-700 border-emerald-200;
   }
 
   .badge-warning {
-    @apply badge bg-amber-500/15 text-amber-400 border border-amber-500/20;
+    @apply badge bg-amber-50 text-amber-600 border-amber-200;
   }
 
   .badge-danger {
-    @apply badge bg-red-500/15 text-red-400 border border-red-500/20;
+    @apply badge bg-rose-50 text-rose-600 border-rose-200;
   }
 
   /* ─── Saved Job Bookmark ────────────────────────────────────────── */
   .bookmark-btn {
-    @apply p-2 rounded-lg transition-all duration-200
-           text-surface-500 hover:text-amber-400 hover:bg-amber-500/10;
+    @apply p-2.5 rounded-xl transition-all duration-200 border-2 border-transparent
+           text-surface-400 bg-surface-100/50 hover:text-ink hover:bg-white hover:border-ink hover:shadow-brutal-sm;
   }
 
   .bookmark-btn.saved {
-    @apply text-amber-400 bg-amber-500/10;
+    @apply text-brand-500 bg-brand-50 border-brand-200;
   }
 
   /* ─── Skeleton Loading ──────────────────────────────────────────── */
   .skeleton {
-    @apply bg-white/[0.06] rounded-lg animate-pulse;
+    @apply bg-surface-200 rounded-lg animate-pulse;
   }
 
   /* ─── Toast Override ────────────────────────────────────────────── */
   .toast-custom {
-    @apply bg-surface-800 text-white border border-white/[0.1] rounded-xl shadow-2xl;
+    @apply bg-white text-ink border-2 border-ink rounded-xl shadow-brutal font-semibold;
   }
 
   /* ─── Divider ───────────────────────────────────────────────────── */
   .divider {
-    @apply border-t border-white/[0.06];
+    @apply border-t-2 border-surface-200;
   }
 
   /* ─── Step Connector (How It Works) ─────────────────────────────── */
   .step-connector {
-    @apply hidden md:block absolute top-8 left-[calc(50%+2rem)] w-[calc(100%-4rem)] h-px
-           bg-gradient-to-r from-brand-500/30 via-brand-500/10 to-transparent;
+    @apply hidden md:block absolute top-10 left-[calc(50%+2.5rem)] w-[calc(100%-5rem)] h-[2px]
+           bg-surface-200 border-none outline-none;
   }
 }
 
 @layer utilities {
-  /* ─── Animation Utilities ───────────────────────────────────────── */
   .animation-delay-150 {
     animation-delay: 150ms;
   }
@@ -260,12 +229,6 @@
     animation-delay: 700ms;
   }
 
-  /* ─── Text Glow ─────────────────────────────────────────────────── */
-  .text-glow {
-    text-shadow: 0 0 20px rgba(51, 102, 255, 0.5);
-  }
-
-  /* ─── Number Tabular ────────────────────────────────────────────── */
   .tabular-nums {
     font-variant-numeric: tabular-nums;
   }
