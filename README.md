@@ -84,6 +84,7 @@ docker-compose up
 
 ### Security TODO
 - The demo stack still uses local-only defaults in `docker-compose.yml`, including exposed service ports, wildcard CORS, and placeholder database credentials. Keep those defaults for hackathon demos only and harden them before any shared or production deployment.
+- Verification demo behavior is documented in [docs/VERIFICATION_DEMO.md](docs/VERIFICATION_DEMO.md).
 
 ## 🧪 Local Development Setup
 
