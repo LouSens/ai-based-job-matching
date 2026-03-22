@@ -1,17 +1,17 @@
 """
-KerjaCerdas — ORM Models
+KerjaCerdas ORM Models
 ==========================
 SQLAlchemy 2.0 declarative models for all core entities.
 
 Tables:
-  - users            — Auth users (seekers + employers)
-  - seeker_profiles   — Extended seeker data
-  - job_postings      — Job listings (employer-created)
-  - saved_jobs        — Seeker bookmarks
-  - applications      — Job applications
-  - verification_logs — e-KYC / SIVIL audit trail (ZK commitments only)
+  - users            - Auth users (seekers + employers)
+  - seeker_profiles  - Extended seeker data
+  - job_postings     - Job listings (employer-created)
+  - saved_jobs       - Seeker bookmarks
+  - applications     - Job applications
+  - verification_logs - e-KYC / SIVIL audit trail
 
-ANTIGRAVITY PROTOCOL §7: PostgreSQL 15 + JSONB for flexible profiles.
+ANTIGRAVITY PROTOCOL Section 7: PostgreSQL 15 + JSONB for flexible profiles.
 """
 from __future__ import annotations
 
@@ -44,13 +44,9 @@ def _uuid() -> str:
     return str(uuid.uuid4())
 
 
-# ──────────────────────────────────────────────────────────────────────────────
-#  USERS
-# ──────────────────────────────────────────────────────────────────────────────
-
 class User(Base):
     """
-    Core user table — supports both seeker and employer roles.
+    Core user table - supports both seeker and employer roles.
 
     Password is stored as a bcrypt hash (never plaintext).
     """
@@ -71,10 +67,6 @@ class User(Base):
     posted_jobs: Mapped[list["JobPosting"]] = relationship(back_populates="employer")
     saved_jobs: Mapped[list["SavedJob"]] = relationship(back_populates="user")
 
-
-# ──────────────────────────────────────────────────────────────────────────────
-#  SEEKER PROFILES
-# ──────────────────────────────────────────────────────────────────────────────
 
 class SeekerProfile(Base):
     """
@@ -99,10 +91,6 @@ class SeekerProfile(Base):
     # Relationships
     user: Mapped["User"] = relationship(back_populates="seeker_profile")
 
-
-# ──────────────────────────────────────────────────────────────────────────────
-#  JOB POSTINGS
-# ──────────────────────────────────────────────────────────────────────────────
 
 class JobPosting(Base):
     """
@@ -136,10 +124,6 @@ class JobPosting(Base):
     employer: Mapped["User"] = relationship(back_populates="posted_jobs")
 
 
-# ──────────────────────────────────────────────────────────────────────────────
-#  SAVED JOBS (Bookmarks)
-# ──────────────────────────────────────────────────────────────────────────────
-
 class SavedJob(Base):
     """Seeker's bookmarked / saved job postings."""
 
@@ -157,15 +141,11 @@ class SavedJob(Base):
     job: Mapped["JobPosting"] = relationship()
 
 
-# ──────────────────────────────────────────────────────────────────────────────
-#  VERIFICATION LOGS
-# ──────────────────────────────────────────────────────────────────────────────
-
 class VerificationLog(Base):
     """
     Audit trail for e-KYC and SIVIL verifications.
 
-    CRITICAL: Only stores ZK commitment hash — never raw PII.
+    CRITICAL: Only stores a verification hash - never raw PII.
     """
 
     __tablename__ = "verification_logs"
@@ -174,6 +154,6 @@ class VerificationLog(Base):
     user_id: Mapped[str] = mapped_column(String(36), ForeignKey("users.id", ondelete="CASCADE"), index=True)
     verification_type: Mapped[str] = mapped_column(String(20))  # 'ekyc' | 'sivil'
     status: Mapped[str] = mapped_column(String(20))  # 'VERIFIED' | 'FAILED'
-    zk_commitment: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    verification_hash: Mapped[str | None] = mapped_column(String(64), nullable=True)
     match_score: Mapped[float] = mapped_column(Float, default=0.0)
     verified_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)

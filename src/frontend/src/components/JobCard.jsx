@@ -25,7 +25,7 @@ export default function JobCard({ job, index }) {
      */
     const getRingColor = (s) => {
         if (s >= 85) return '#059669' // emerald-600
-        if (s >= 70) return '#ea580c' // brand-600 (orange)
+        if (s >= 70) return '#f03a08' // brand-600
         if (s >= 50) return '#d97706' // amber-600
         return '#dc2626' // red-600
     }

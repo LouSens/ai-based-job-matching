@@ -159,8 +159,8 @@ class EkycVerificationResponse(BaseModel):
     status: str  # e.g., "VERIFIED", "FAILED", "PENDING_MANUAL_REVIEW"
     match_percentage: float
     message: str
-    zk_commitment: str | None = None
-    pii_redacted: bool = True
+    verification_hash: str | None = None
+    pii_redacted: bool = True  # generic privacy indicator
 
 
 class SivilVerificationRequest(BaseModel):
@@ -491,24 +491,24 @@ async def list_jobs(limit: int = 10, region: str | None = None):
 async def verify_identity(request: EkycVerificationRequest):
     """
     Mock e-KYC integration with Dukcapil/PSrE to verify candidate identity.
-    Simulates checking NIK, Name, and biometric selfie matching using Zero-Knowledge.
+    Simulates checking NIK and identity metadata using demo-only rules.
     """
-    from src.api.services.zk_verifier import ZKPrivacyService
-    
-    # Process through the Zero-Knowledge Privacy Service
-    # Placed in services/ to follow project directory structure
-    zk_result = ZKPrivacyService.verify_identity_proof(
+    from src.api.services.identity_verifier import MockIdentityVerificationService
+
+    verification_result = MockIdentityVerificationService.verify_identity(
         nik=request.nik,
         full_name=request.full_name
     )
-    
+
     return EkycVerificationResponse(
         request_id=str(uuid.uuid4()),
-        status="VERIFIED" if zk_result["is_valid"] else "FAILED",
-        match_percentage=zk_result["match_score"],
-        message="Identitas berhasil diverifikasi lewat ZK-Proof Hash." if zk_result["is_valid"] else "Gagal verifikasi identitas ZK-Proof.",
-        zk_commitment=zk_result["zk_commitment"],
-        pii_redacted=zk_result["pii_redacted"]
+        status="VERIFIED" if verification_result["is_valid"] else "FAILED",
+        match_percentage=verification_result["match_score"],
+        message="Identitas berhasil diverifikasi pada mode demo."
+        if verification_result["is_valid"]
+        else "Verifikasi identitas gagal pada mode demo.",
+        verification_hash=verification_result["verification_hash"],
+        pii_redacted=verification_result["pii_redacted"]
     )
 
 

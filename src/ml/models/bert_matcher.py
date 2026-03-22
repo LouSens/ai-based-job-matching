@@ -122,7 +122,12 @@ class BERTMatcher(nn.Module):
         checkpoint = torch.load(path, map_location="cpu", weights_only=True)
 
         if isinstance(checkpoint, dict):
-            state_dict = checkpoint.get("state_dict") or checkpoint.get("model_state")
+            if "state_dict" in checkpoint:
+                state_dict = checkpoint["state_dict"]
+            elif "model_state" in checkpoint:
+                state_dict = checkpoint["model_state"]
+            else:
+                state_dict = checkpoint
         else:
             state_dict = checkpoint
 

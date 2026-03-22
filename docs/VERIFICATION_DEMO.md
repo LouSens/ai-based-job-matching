@@ -27,7 +27,7 @@ The backend route is `POST /api/v1/verify/identity`.
 
 ### Demo Logic
 
-The identity verification uses rule-based logic in the mock `ZKPrivacyService`:
+The identity verification uses rule-based logic in the mock `MockIdentityVerificationService`:
 
 - verification passes only if the NIK length is exactly 16 characters
 - verification fails if the NIK starts with `99`
@@ -40,27 +40,27 @@ On success, the API returns:
 
 - `status = "VERIFIED"`
 - `match_percentage = 98.5`
-- `message = "Identitas berhasil diverifikasi lewat ZK-Proof Hash."`
-- `zk_commitment`
+- `message = "Identitas berhasil diverifikasi pada mode demo."`
+- `verification_hash`
 - `pii_redacted = true`
 
 On failure, the API returns:
 
 - `status = "FAILED"`
 - `match_percentage = 45.2`
-- `message = "Gagal verifikasi identitas ZK-Proof."`
-- `zk_commitment`
+- `message = "Verifikasi identitas gagal pada mode demo."`
+- `verification_hash`
 - `pii_redacted = true`
 
-### ZK Commitment
+### Verification Hash
 
-The `zk_commitment` is a deterministic SHA-256 hash of:
+The `verification_hash` is a deterministic SHA-256 hash of:
 
 ```text
 nik:full_name
 ```
 
-This is only a mock privacy-preserving artifact for the demo. It does not prove real-world identity verification.
+This is only a mock verification artifact for the demo. It does not prove real-world identity verification.
 
 ### Important Limitations
 
@@ -137,7 +137,7 @@ Identity-specific UI behavior:
 
 - submit is disabled until the NIK is 16 digits long
 - the input strips non-digit characters
-- after success, the UI masks the NIK and shows the returned `zk_commitment`
+- after success, the UI masks the NIK and shows the returned `verification_hash`
 - after failure, the UI hints that test NIKs starting with `99` will fail
 
 Education-specific UI behavior:
@@ -150,6 +150,6 @@ Education-specific UI behavior:
 Current implementation references:
 
 - `src/api/main.py`
-- `src/api/services/zk_verifier.py`
+- `src/api/services/identity_verifier.py`
 - `src/frontend/src/services/api.js`
 - `src/frontend/src/components/VerificationDashboard.jsx`

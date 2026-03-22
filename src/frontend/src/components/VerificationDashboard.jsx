@@ -10,7 +10,7 @@ export default function VerificationDashboard() {
     const [sivilData, setSivilData] = useState({ ijazah: '', university: '', major: '' });
     
     const [sivilResult, setSivilResult] = useState(null);
-    const [zkCommitment, setZkCommitment] = useState(null);
+    const [verificationHash, setVerificationHash] = useState(null);
 
     const handleVerifyEkyc = async (e) => {
         e.preventDefault();
@@ -22,7 +22,7 @@ export default function VerificationDashboard() {
                 date_of_birth: ekycData.dob
             });
             if (data.status === 'VERIFIED') {
-                setZkCommitment(data.zk_commitment);
+                setVerificationHash(data.verification_hash);
                 setEkycStatus('verified');
             } else {
                 setEkycStatus('failed');
@@ -70,11 +70,11 @@ export default function VerificationDashboard() {
                     <Lock className="w-5 h-5 text-emerald-600" />
                 </div>
                 <div>
-                    <h3 className="text-sm font-bold text-emerald-900 mb-1">Jaminan Privasi Zero-Knowledge</h3>
+                    <h3 className="text-sm font-bold text-emerald-900 mb-1">Jaminan Privasi Verifikasi Demo</h3>
                     <p className="text-xs text-emerald-700 leading-relaxed">
-                        Data identitas Anda (NIK, Foto) <strong>TIDAK PERNAH disimpan</strong> di server KerjaCerdas. 
-                        Sistem kami bekerja menggunakan arsitektur pass-through tersandi (E2EE) langsung ke lembaga PSrE resmi dan Dukcapil. 
-                        Kami hanya menyimpan status persentase kecocokan ("Verifikasi Sukses"). Anda memegang kendali penuh.
+                        Data identitas Anda digunakan hanya untuk simulasi verifikasi pada demo ini.
+                        KerjaCerdas menampilkan status hasil verifikasi dan hash referensi mock agar alur UI dapat diuji
+                        tanpa ketergantungan pada layanan verifikasi eksternal.
                     </p>
                 </div>
             </div>
@@ -108,13 +108,13 @@ export default function VerificationDashboard() {
                             </div>
                             <div className="text-sm font-medium text-slate-900 mb-3">Nama: {ekycData.name}</div>
                             
-                            <div className="bg-emerald-50 border border-emerald-100 rounded-xl p-3 mb-4">
+                                <div className="bg-emerald-50 border border-emerald-100 rounded-xl p-3 mb-4">
                                 <div className="text-[10px] sm:text-xs font-bold text-emerald-700 mb-1 flex items-center gap-1.5">
                                     <Lock className="w-3.5 h-3.5" />
-                                    ZKP Hash (Zero-Knowledge Proof)
+                                    Hash Referensi Verifikasi
                                 </div>
                                 <div className="font-mono text-[10px] sm:text-xs text-emerald-600 break-all leading-relaxed">
-                                    {zkCommitment || '0x' + Array(64).fill(0).map(() => Math.floor(Math.random() * 16).toString(16)).join('')}
+                                    {verificationHash || '0x' + Array(64).fill(0).map(() => Math.floor(Math.random() * 16).toString(16)).join('')}
                                 </div>
                             </div>
 

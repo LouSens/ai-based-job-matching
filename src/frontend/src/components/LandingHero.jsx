@@ -63,6 +63,12 @@ const FEATURES_EMPLOYER = [
     },
 ]
 
+const FEATURE_ICON_BG_CLASS = {
+    brand: 'bg-brand-400',
+    emerald: 'bg-emerald-400',
+    purple: 'bg-purple-400',
+}
+
 const HOW_IT_WORKS_SEEKER = [
     { step: '01', title: 'Buat Profil', description: 'Isi detail skill, pengalaman, dan gaji idamanmu.' },
     { step: '02', title: 'AI Matching', description: 'Sistem menganalisis jutaan titik data untuk mencari kecocokan tertinggi.' },
@@ -278,7 +284,7 @@ export default function LandingHero() {
                             className="bg-surface-50 border-[3px] border-ink shadow-[6px_6px_0px_#111827] hover:shadow-[10px_10px_0px_#111827] hover:-translate-y-1 transition-all p-8 group flex flex-col items-start"
                             style={{ animationDelay: `${i * 150}ms` }}
                         >
-                            <div className={`w-16 h-16 bg-${color}-400 border-[3px] border-ink shadow-[4px_4px_0px_#111827] mb-8 group-hover:scale-110 group-hover:-rotate-6 group-hover:bg-brand-400 transition-all duration-300 flex items-center justify-center`}>
+                            <div className={`w-16 h-16 ${FEATURE_ICON_BG_CLASS[color] ?? FEATURE_ICON_BG_CLASS.brand} border-[3px] border-ink shadow-[4px_4px_0px_#111827] mb-8 group-hover:scale-110 group-hover:-rotate-6 group-hover:bg-brand-400 transition-all duration-300 flex items-center justify-center`}>
                                 <Icon className="w-8 h-8 text-ink stroke-[3px]" />
                             </div>
                             <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border-2 border-ink text-[10px] uppercase font-black text-ink tracking-widest mb-6 shadow-[2px_2px_0px_#111827]">
