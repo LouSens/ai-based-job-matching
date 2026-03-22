@@ -119,5 +119,20 @@ class BERTMatcher(nn.Module):
 
     def load(self, path: str) -> None:
         """Load model checkpoint."""
-        self.load_state_dict(torch.load(path, map_location="cpu"))
+        checkpoint = torch.load(path, map_location="cpu", weights_only=True)
+
+        if isinstance(checkpoint, dict):
+            if "state_dict" in checkpoint:
+                state_dict = checkpoint["state_dict"]
+            elif "model_state" in checkpoint:
+                state_dict = checkpoint["model_state"]
+            else:
+                state_dict = checkpoint
+        else:
+            state_dict = checkpoint
+
+        if not isinstance(state_dict, dict) or not state_dict:
+            raise ValueError(f"Checkpoint at {path} does not contain a valid state_dict")
+
+        self.load_state_dict(state_dict)
         logger.info(f"Model loaded from {path}")

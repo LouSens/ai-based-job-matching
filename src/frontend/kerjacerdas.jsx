@@ -394,7 +394,7 @@ export default function KerjaCerdas() {
 
             {/* Footer */}
             <div style={{ textAlign: "center", padding: "2rem 0 1rem", fontSize: "0.65rem", color: C.muted, borderTop: `1px solid ${C.cardBorder}`, marginTop: "2rem" }}>
-                KERJACERDAS v0.1 · HACKATHON DEMO · BUILT ON ANTIGRAVITY PROTOCOL · AI/ML + BLOCKCHAIN TRACK
+                KERJACERDAS v0.1 · HACKATHON DEMO · BUILT ON ANTIGRAVITY PROTOCOL · AI/ML TRACK
             </div>
 
             <style>{`

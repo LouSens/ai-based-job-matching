@@ -8,6 +8,7 @@ ANTIGRAVITY PROTOCOL: All endpoints must be typed, documented, and logged.
 from __future__ import annotations
 
 import logging
+import secrets
 import time
 import uuid
 from contextlib import asynccontextmanager
@@ -16,8 +17,19 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
+from config.settings import Settings, settings
+from src.api.database import init_db, reconfigure
+from src.api.services.auth_service import configure as configure_auth
+
+# Import our new routers
+from src.api.routers.auth import router as auth_router
+from src.api.routers.employer import router as employer_router
+from src.api.routers.seeker import router as seeker_router
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+_DEFAULT_DATABASE_URL = Settings.model_fields["database_url"].default
 
 
 # ─── Pydantic Schemas ────────────────────────────────────────────────────────
@@ -133,6 +145,39 @@ class AdvisorResponse(BaseModel):
     confidence: float
 
 
+class EkycVerificationRequest(BaseModel):
+    """Request for e-KYC identity verification (Mock Dukcapil/PSrE)."""
+    nik: str = Field(..., min_length=16, max_length=16)
+    full_name: str
+    date_of_birth: str
+    selfie_image_base64: str | None = None
+
+
+class EkycVerificationResponse(BaseModel):
+    """Response from e-KYC verification."""
+    request_id: str
+    status: str  # e.g., "VERIFIED", "FAILED", "PENDING_MANUAL_REVIEW"
+    match_percentage: float
+    message: str
+    verification_hash: str | None = None
+    pii_redacted: bool = True  # generic privacy indicator
+
+
+class SivilVerificationRequest(BaseModel):
+    """Request for diploma verification (Mock SIVIL/Dikti)."""
+    ijazah_number: str
+    university_name: str
+    major: str
+
+
+class SivilVerificationResponse(BaseModel):
+    """Response from diploma verification."""
+    request_id: str
+    status: str  # e.g., "VERIFIED", "NOT_FOUND"
+    message: str
+    verified_data: dict | None = None
+
+
 # ─── Mock Data (Demo Mode) ────────────────────────────────────────────────────
 
 MOCK_JOBS = [
@@ -225,7 +270,33 @@ MOCK_JOBS = [
 async def lifespan(app: FastAPI):
     """Application startup and shutdown."""
     logger.info("🚀 KerjaCerdas API starting up...")
-    # In production: initialize DB connections, load ML models, warm up agents
+
+    # In demo/development, keep the app bootable without a live local Postgres instance.
+    database_url = settings.database_url
+    if not settings.is_production and database_url == _DEFAULT_DATABASE_URL:
+        database_url = "sqlite+aiosqlite:///./kerjacerdas.db"
+
+    logger.info("Startup database selected: %s", database_url)
+    reconfigure(database_url)
+    await init_db()
+
+    # Configure Auth Service from env; production must provide a stable secret.
+    jwt_secret = settings.jwt_secret_key
+    if not jwt_secret and settings.is_production:
+        raise RuntimeError("JWT_SECRET_KEY must be set")
+    if not jwt_secret:
+        jwt_secret = secrets.token_urlsafe(32)
+        logger.warning(
+            "JWT_SECRET_KEY is not set; using an ephemeral development secret. "
+            "Tokens will be invalid after restart."
+        )
+
+    configure_auth(
+        secret_key=jwt_secret,
+        expire_minutes=settings.jwt_access_token_expire_minutes,
+    )
+
+    # In production: initialize further connections, load ML models, warm up agents
     yield
     logger.info("KerjaCerdas API shutting down...")
 
@@ -246,6 +317,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Include the newly refactored routers
+app.include_router(auth_router, prefix="/api/v1")
+app.include_router(employer_router, prefix="/api/v1")
+app.include_router(seeker_router, prefix="/api/v1")
 
 
 # ─── Middleware: Request Logging ──────────────────────────────────────────────
@@ -407,3 +483,57 @@ async def list_jobs(limit: int = 10, region: str | None = None):
     """List available job postings, optionally filtered by region."""
     jobs = MOCK_JOBS[:limit]
     return {"jobs": jobs, "total": len(jobs)}
+
+
+# ─── Verification Endpoints (e-KYC & SIVIL) ───────────────────────────────────
+
+@app.post("/api/v1/verify/identity", response_model=EkycVerificationResponse)
+async def verify_identity(request: EkycVerificationRequest):
+    """
+    Mock e-KYC integration with Dukcapil/PSrE to verify candidate identity.
+    Simulates checking NIK and identity metadata using demo-only rules.
+    """
+    from src.api.services.identity_verifier import MockIdentityVerificationService
+
+    verification_result = MockIdentityVerificationService.verify_identity(
+        nik=request.nik,
+        full_name=request.full_name
+    )
+
+    return EkycVerificationResponse(
+        request_id=str(uuid.uuid4()),
+        status="VERIFIED" if verification_result["is_valid"] else "FAILED",
+        match_percentage=verification_result["match_score"],
+        message="Identitas berhasil diverifikasi pada mode demo."
+        if verification_result["is_valid"]
+        else "Verifikasi identitas gagal pada mode demo.",
+        verification_hash=verification_result["verification_hash"],
+        pii_redacted=verification_result["pii_redacted"]
+    )
+
+
+@app.post("/api/v1/verify/education", response_model=SivilVerificationResponse)
+async def verify_education(request: SivilVerificationRequest):
+    """
+    Mock integration with SIVIL (Sistem Informasi Verifikasi Ijazah Elektronik)
+    to verify candidate's university degree authenticity.
+    """
+    # Demo logic: if ijazah number is empty or "0000", simulate not found.
+    is_valid = request.ijazah_number and request.ijazah_number != "0000"
+    
+    verified_data = None
+    if is_valid:
+        verified_data = {
+            "university": request.university_name,
+            "major": request.major,
+            "graduation_year": "2023",
+            "degree": "S1",
+            "status": "Lulus"
+        }
+        
+    return SivilVerificationResponse(
+        request_id=str(uuid.uuid4()),
+        status="VERIFIED" if is_valid else "NOT_FOUND",
+        message="Ijazah terdaftar resmi di SIVIL (Kemdikbudristek)." if is_valid else "Nomor Ijazah tidak ditemukan di database SIVIL.",
+        verified_data=verified_data
+    )

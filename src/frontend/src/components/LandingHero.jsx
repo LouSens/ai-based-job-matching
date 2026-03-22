@@ -9,8 +9,8 @@ import useStore from '../store/useStore'
  */
 
 const ANIMATED_STATS = [
-    { value: 50000, label: 'Lowongan Aktif', suffix: '+', icon: Briefcase },
-    { value: 1200, label: 'Perusahaan Terdaftar', suffix: '+', icon: Building2 },
+    { value: 131, label: 'Lowongan Aktif', suffix: '+', icon: Briefcase },
+    { value: 0, label: 'Perusahaan Terdaftar', suffix: '+', icon: Building2 },
     { value: 87, label: 'Akurasi Matching', suffix: '%', icon: BarChart3 },
     { value: 140, label: 'Response Time (ms)', suffix: 'ms', icon: Clock },
 ]
@@ -20,21 +20,21 @@ const FEATURES_SEEKER = [
         icon: Search,
         title: 'AI Job Matching',
         description: 'Kemampuan IndoBERT mencocokkan profil profilmu dengan lowongan terbaik di seluruh Indonesia secara akurat dan semantik.',
-        gradient: 'from-blue-500 to-cyan-500',
+        color: 'brand',
         tag: 'IndoBERT',
     },
     {
         icon: BarChart3,
         title: 'Analisis Skill Gap',
         description: 'Ketahui skill apa yang masih kurang untuk posisi impianmu, lengkap dengan rekomendasi kursus yang tepat.',
-        gradient: 'from-emerald-500 to-teal-500',
+        color: 'emerald',
         tag: 'RAG Pipeline',
     },
     {
         icon: Bot,
         title: 'AI Career Advisor',
         description: 'Asisten karier AI interaktif yang siap membimbingmu mulai dari penyusunan CV hingga persiapan wawancara 24/7.',
-        gradient: 'from-purple-500 to-pink-500',
+        color: 'purple',
         tag: 'Gemini 3.0',
     },
 ]
@@ -44,24 +44,30 @@ const FEATURES_EMPLOYER = [
         icon: Users,
         title: 'AI Candidate Sourcing',
         description: 'Temukan talenta terbaik dengan sekali pencarian. AI kami meranking kandidat berdasarkan kecocokan skill & pengalaman.',
-        gradient: 'from-emerald-500 to-teal-500',
+        color: 'emerald',
         tag: 'Smart Rank',
     },
     {
         icon: Building2,
         title: 'Employer Dashboard Terpadu',
         description: 'Kelola ratusan pelamar, pantau performa iklan lowongan kerja, dan analisis tren supply & demand talenta.',
-        gradient: 'from-blue-500 to-cyan-500',
+        color: 'brand',
         tag: 'Analytics',
     },
     {
         icon: Shield,
-        title: 'Verifikasi Blockchain',
-        description: 'Sistem verifikasi kredensial terdesentralisasi yang menjamin keaslian ijazah dan sertifikat pelatihan kandidat.',
-        gradient: 'from-purple-500 to-pink-500',
-        tag: 'Ethereum',
+        title: 'Verifikasi e-KYC & SIVIL',
+        description: 'Integrasi dengan database nasional untuk memverifikasi identitas, KTP, dan keaslian kredensial kandidat secara instan.',
+        color: 'purple',
+        tag: 'Dukcapil / Dikti',
     },
 ]
+
+const FEATURE_ICON_BG_CLASS = {
+    brand: 'bg-brand-400',
+    emerald: 'bg-emerald-400',
+    purple: 'bg-purple-400',
+}
 
 const HOW_IT_WORKS_SEEKER = [
     { step: '01', title: 'Buat Profil', description: 'Isi detail skill, pengalaman, dan gaji idamanmu.' },
@@ -111,58 +117,76 @@ export default function LandingHero() {
     return (
         <div className="relative overflow-hidden animate-fade-in">
             {/* ── HERO SECTION ── */}
-            <section className="relative max-w-6xl mx-auto px-4 sm:px-6 pt-12 pb-20 md:pt-20 md:pb-28">
-                {/* Decorative orbs */}
-                <div className="absolute top-20 right-0 w-72 h-72 bg-brand-500/[0.08] rounded-full blur-[100px] animate-float" />
-                <div className="absolute bottom-0 left-10 w-60 h-60 bg-cyan-500/[0.06] rounded-full blur-[80px] animate-float animation-delay-500" />
+            <section className="relative max-w-7xl mx-auto px-4 sm:px-6 pt-12 pb-20 md:pt-16 md:pb-28">
+                <div className="relative text-center max-w-5xl mx-auto">
+                    
+                    {/* Retro Window Headline Box */}
+                    <div className="bg-white border-[3px] md:border-[6px] border-ink rounded-[1.5rem] md:rounded-[2.5rem] shadow-[8px_8px_0px_#111827] md:shadow-[16px_16px_0px_#111827] p-8 sm:p-12 md:p-16 relative mb-12 sm:hover:-translate-y-2 hover:shadow-[10px_10px_0px_#111827] md:hover:shadow-[20px_20px_0px_#111827] transition-all duration-300 overflow-hidden">
+                        
+                        {/* Fake Window Controls */}
+                        <div className="absolute top-5 md:top-6 left-5 md:left-8 flex gap-2.5">
+                            <div className="w-3.5 h-3.5 md:w-5 md:h-5 rounded-full bg-rose-400 border-2 md:border-[3px] border-ink"></div>
+                            <div className="w-3.5 h-3.5 md:w-5 md:h-5 rounded-full bg-amber-400 border-2 md:border-[3px] border-ink"></div>
+                            <div className="w-3.5 h-3.5 md:w-5 md:h-5 rounded-full bg-emerald-400 border-2 md:border-[3px] border-ink"></div>
+                        </div>
+                        <div className="absolute top-4 md:top-6 right-5 md:right-8 hidden sm:block">
+                            <span className="text-[10px] md:text-sm font-black uppercase tracking-widest text-ink">KerjaCerdas.exe</span>
+                        </div>
+                        <div className="absolute top-16 md:top-20 left-0 w-full h-[3px] md:h-[6px] bg-ink"></div>
 
-                <div className="relative text-center max-w-4xl mx-auto">
-                    {/* Badge */}
-                    <div className="animate-fade-in-up inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand-500/10 border border-brand-500/20 mb-8 mt-4">
-                        <Zap className="w-3.5 h-3.5 text-brand-400" />
-                        <span className="text-xs font-semibold text-brand-300 tracking-wide">
-                            HACKATHON 2026 · DIGDAYA × OJK · AI/ML + BLOCKCHAIN
-                        </span>
-                    </div>
+                        <div className="mt-16 md:mt-20">
+                            {/* Badge */}
+                            <div className="animate-fade-in-up inline-flex items-center gap-2 px-4 py-2 bg-[#FF90E8] border-[3px] border-ink mb-6 shadow-[4px_4px_0px_#111827] transform -rotate-2 hover:rotate-0 transition-transform">
+                                <Zap className="w-4 h-4 md:w-5 md:h-5 text-ink fill-ink" />
+                                <span className="text-xs md:text-sm font-black text-ink tracking-widest uppercase">
+                                    HACKATHON 2026 · DIGDAYA
+                                </span>
+                            </div>
 
-                    {/* Headline */}
-                    <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.1] mb-6 animate-fade-in-up animation-delay-150">
-                        Evolusi Rekrutmen <br className="hidden sm:block" />
-                        Platform AI <span className="gradient-text">Terdepan</span>
-                    </h1>
+                            {/* Headline */}
+                            <h1 className="text-[2.5rem] sm:text-6xl md:text-[5.5rem] lg:text-[6.5rem] font-black text-ink tracking-tight mb-10 animate-fade-in-up animation-delay-150 uppercase leading-tight md:leading-snug">
+                                Evolusi <br className="hidden sm:block"/>
+                                <span className="relative inline-block mt-4 mb-4 bg-[#FFC900] px-3 md:px-5 py-0 md:py-2 border-[3px] md:border-[6px] border-ink shadow-[4px_4px_0px_#111827] md:shadow-[8px_8px_0px_#111827] transform rotate-1">
+                                    Rekrutmen
+                                </span><br/>
+                                <span className="text-[#00E5FF] tracking-tighter" style={{ textShadow: '3px 3px 0px #111827, 4px 4px 0px #111827, -1px -1px 0 #111827, 1px -1px 0 #111827, -1px 1px 0 #111827, 1px 1px 0 #111827' }}>
+                                    AI Terdepan
+                                </span>
+                            </h1>
 
-                    {/* Subheadline */}
-                    <p className="text-surface-400 text-base sm:text-lg max-w-3xl mx-auto mb-10 leading-relaxed animate-fade-in-up animation-delay-300">
-                        Menghubungkan jutaan <strong className="text-white">Pencari Kerja</strong> dengan{' '}
-                        <strong className="text-white">Perusahaan Terbaik</strong> di seluruh Indonesia.
-                        Didukung oleh model AI semantik untuk akurasi pencocokan tertinggi.
-                    </p>
+                            {/* Subheadline */}
+                            <p className="text-xl sm:text-2xl font-bold text-ink max-w-3xl mx-auto leading-loose sm:leading-relaxed animate-fade-in-up animation-delay-300">
+                                Menghubungkan <span className="bg-[#B8FF6D] px-2 py-1 border-[3px] border-ink inline-block transform -rotate-1 shadow-[2px_2px_0px_#111827] mx-1">Pencari Kerja</span> dengan{' '}
+                                <span className="bg-[#FF90E8] px-2 py-1 border-[3px] border-ink inline-block transform rotate-1 shadow-[2px_2px_0px_#111827] mx-1 mt-2 sm:mt-0">Perusahaan</span> di seluruh Indonesia.
+                            </p>
 
-                    {/* Audience Switcher */}
-                    <div className="flex justify-center mb-8 animate-fade-in-up animation-delay-500">
-                        <div className="inline-flex rounded-2xl bg-white/[0.04] border border-white/[0.08] p-1.5">
-                            <button
-                                onClick={() => setAudience('seeker')}
-                                className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 ${
-                                    audience === 'seeker'
-                                        ? 'bg-brand-500 text-white shadow-lg shadow-brand-500/25'
-                                        : 'text-surface-400 hover:text-white hover:bg-white/[0.04]'
-                                }`}
-                            >
-                                <Search className="w-4 h-4" />
-                                Untuk Pencari Kerja
-                            </button>
-                            <button
-                                onClick={() => setAudience('employer')}
-                                className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 ${
-                                    audience === 'employer'
-                                        ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/25'
-                                        : 'text-surface-400 hover:text-white hover:bg-white/[0.04]'
-                                }`}
-                            >
-                                <Building2 className="w-4 h-4" />
-                                Untuk Pemberi Kerja
-                            </button>
+                            {/* Audience Switcher */}
+                            <div className="flex justify-center animate-fade-in-up animation-delay-500">
+                                <div className="inline-flex flex-col sm:flex-row rounded-2xl md:rounded-[2rem] bg-surface-50 border-[3px] md:border-[4px] border-ink p-1.5 shadow-[4px_4px_0px_#111827] gap-1 relative overflow-hidden">
+                                    <button
+                                        onClick={() => setAudience('seeker')}
+                                        className={`flex items-center justify-center gap-2 px-6 sm:px-8 py-3 rounded-xl md:rounded-[1.5rem] text-sm md:text-base font-black transition-all duration-300 border-2 ${
+                                            audience === 'seeker'
+                                                ? 'bg-ink text-[#B8FF6D] border-ink shadow-brutal'
+                                                : 'text-ink border-transparent hover:bg-surface-200'
+                                        }`}
+                                    >
+                                        <Search className="w-5 h-5" />
+                                        Pencari Kerja
+                                    </button>
+                                    <button
+                                        onClick={() => setAudience('employer')}
+                                        className={`flex items-center justify-center gap-2 px-6 sm:px-8 py-3 rounded-xl md:rounded-[1.5rem] text-sm md:text-base font-black transition-all duration-300 border-2 ${
+                                            audience === 'employer'
+                                                ? 'bg-ink text-[#FF90E8] border-ink shadow-brutal'
+                                                : 'text-ink border-transparent hover:bg-surface-200'
+                                        }`}
+                                    >
+                                        <Building2 className="w-5 h-5" />
+                                        Pemberi Kerja
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -172,7 +196,7 @@ export default function LandingHero() {
                             <>
                                 <button
                                     onClick={() => setActiveTab('match')}
-                                    className="btn-glow group flex items-center gap-2 text-base px-8 py-4 w-full sm:w-auto"
+                                    className="btn-glow group flex items-center gap-2 text-base px-8 py-4 w-full sm:w-auto font-bold"
                                 >
                                     <Search className="w-5 h-5" />
                                     Cari Pekerjaan
@@ -180,7 +204,7 @@ export default function LandingHero() {
                                 </button>
                                 <button
                                     onClick={() => setActiveTab('advisor')}
-                                    className="btn-outline flex items-center gap-2 px-8 py-4 w-full sm:w-auto"
+                                    className="btn-outline flex items-center gap-2 px-8 py-4 w-full sm:w-auto font-bold"
                                 >
                                     <Bot className="w-5 h-5" />
                                     Tanya AI Advisor
@@ -189,8 +213,8 @@ export default function LandingHero() {
                         ) : (
                             <>
                                 <button
-                                    onClick={() => openAuthModal('register')}
-                                    className="btn-glow flex items-center gap-2 text-base px-8 py-4 bg-emerald-500 hover:bg-emerald-400 text-white shadow-emerald-500/20 w-full sm:w-auto border-transparent hover:border-emerald-400/50"
+                                    onClick={() => openAuthModal('register', 'employer')}
+                                    className="btn-glow flex items-center gap-2 text-base px-8 py-4 bg-ink hover:bg-surface-800 text-white shadow-brutal w-full sm:w-auto font-bold"
                                 >
                                     <UserPlus className="w-5 h-5" />
                                     Daftar Sebagai Perusahaan
@@ -198,7 +222,7 @@ export default function LandingHero() {
                                 </button>
                                 <button
                                     onClick={() => openAuthModal('login')}
-                                    className="btn-outline flex items-center gap-2 px-8 py-4 border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/10 hover:border-emerald-500/40 w-full sm:w-auto"
+                                    className="btn-outline flex items-center gap-2 px-8 py-4 w-full sm:w-auto font-bold text-ink"
                                 >
                                     <Building2 className="w-5 h-5" />
                                     Masuk ke Dashboard
@@ -210,29 +234,29 @@ export default function LandingHero() {
                     {/* Trust signals */}
                     <div className="mt-12 flex items-center justify-center gap-6 animate-fade-in animation-delay-1000">
                         <div className="flex -space-x-3">
-                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-500 border-2 border-surface-950 flex items-center justify-center shadow-lg">👨‍💻</div>
-                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 border-2 border-surface-950 flex items-center justify-center shadow-lg">👩‍💼</div>
-                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-500 to-orange-500 border-2 border-surface-950 flex items-center justify-center shadow-lg">👨‍🔬</div>
-                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 border-2 border-surface-950 flex items-center justify-center shadow-lg text-xs font-bold font-sans">+</div>
+                            <div className="w-10 h-10 rounded-full bg-brand-100 border-2 border-ink flex items-center justify-center shadow-sm text-lg">👨‍💻</div>
+                            <div className="w-10 h-10 rounded-full bg-emerald-100 border-2 border-ink flex items-center justify-center shadow-sm text-lg">👩‍💼</div>
+                            <div className="w-10 h-10 rounded-full bg-indigo-100 border-2 border-ink flex items-center justify-center shadow-sm text-lg">👨‍🔬</div>
+                            <div className="w-10 h-10 rounded-full bg-surface-100 border-2 border-ink flex items-center justify-center shadow-sm text-xs font-black text-ink">+</div>
                         </div>
-                        <p className="text-sm font-medium text-surface-300">
-                            Dipercaya oleh <strong className="text-white">10.000+</strong> pengguna terdaftar
+                        <p className="text-sm font-semibold text-surface-600">
+                            Dipercaya oleh <strong className="text-ink font-bold">10.000+</strong> pengguna terdaftar
                         </p>
                     </div>
                 </div>
             </section>
 
             {/* ── STATS BAR ── */}
-            <section className="relative border-y border-white/[0.06] bg-white/[0.02]">
+            <section className="relative border-y-2 border-surface-200 bg-white z-10">
                 <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                         {ANIMATED_STATS.map(({ value, label, suffix, icon: Icon }) => (
-                            <div key={label} className="stat-card group">
-                                <Icon className="w-6 h-6 text-brand-400 mx-auto mb-3 opacity-60 group-hover:opacity-100 transition-opacity group-hover:scale-110 duration-300" />
-                                <div className="text-2xl sm:text-3xl font-extrabold text-white mb-1 tracking-tight">
+                            <div key={label} className="bg-white border-[3px] border-ink p-6 shadow-[4px_4px_0px_#111827] text-center md:text-left group hover:shadow-[8px_8px_0px_#111827] hover:-translate-y-1 transition-all">
+                                <Icon className="w-10 h-10 text-ink stroke-[3px] mb-4 mx-auto md:mx-0 group-hover:scale-110 group-hover:-rotate-6 transition-transform duration-300" />
+                                <div className="text-3xl sm:text-4xl font-black text-ink tracking-tight uppercase">
                                     <AnimatedCounter end={value} suffix={suffix} />
                                 </div>
-                                <div className="text-xs text-surface-400 font-medium tracking-wide uppercase">{label}</div>
+                                <div className="text-sm text-surface-600 font-extrabold tracking-widest uppercase mt-2">{label}</div>
                             </div>
                         ))}
                     </div>
@@ -242,71 +266,61 @@ export default function LandingHero() {
             {/* ── FEATURES ── */}
             <section className="max-w-6xl mx-auto px-4 sm:px-6 py-24">
                 <div className="text-center mb-16">
-                    <span className={`inline-flex mb-4 ${audience === 'seeker' ? 'badge-brand' : 'badge-success'}`}>
+                    <span className="inline-block bg-brand-200 border-[3px] border-ink shadow-[2px_2px_0px_#111827] px-4 py-1.5 text-xs font-black text-ink uppercase tracking-widest mb-6">
                         ✦ KEUNGGULAN PLATFORM
                     </span>
-                    <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight mb-4">
-                        Mengapa <span className={audience === 'seeker' ? 'gradient-text' : 'text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-400'}>
-                            KerjaCerdas?
-                        </span>
+                    <h2 className="text-4xl sm:text-5xl font-black text-ink tracking-tighter mb-4 uppercase">
+                        Mengapa <span className="bg-brand-400 px-3 inline-block shadow-[4px_4px_0px_#111827] border-[3px] border-ink -rotate-1">KerjaCerdas?</span>
                     </h2>
-                    <p className="text-surface-400 max-w-xl mx-auto text-sm leading-relaxed">
-                        Pendekatan berbasis kecerdasan buatan untuk masa depan rekrutmen yang
-                        lebih presisi, obyektif, dan transparan.
+                    <p className="text-ink font-bold max-w-2xl mx-auto text-lg leading-relaxed border-[3px] border-transparent">
+                        Pendekatan berbasis AI untuk merevolusi proses rekrutmen. Lebih presisi, obyektif, dan transparan dari awal hingga akhir.
                     </p>
                 </div>
 
                 <div className="grid md:grid-cols-3 gap-8">
-                    {currentFeatures.map(({ icon: Icon, title, description, gradient, tag }, i) => (
+                    {currentFeatures.map(({ icon: Icon, title, description, color, tag }, i) => (
                         <div
                             key={title}
-                            className="feature-card group bg-surface-900/40 hover:bg-surface-900/80"
+                            className="bg-surface-50 border-[3px] border-ink shadow-[6px_6px_0px_#111827] hover:shadow-[10px_10px_0px_#111827] hover:-translate-y-1 transition-all p-8 group flex flex-col items-start"
                             style={{ animationDelay: `${i * 150}ms` }}
                         >
-                            <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${gradient} p-0.5 mb-6 group-hover:scale-110 transition-transform duration-300 shadow-xl`}>
-                                <div className="w-full h-full rounded-[14px] bg-surface-900 flex items-center justify-center">
-                                    <Icon className="w-6 h-6 text-white" />
-                                </div>
+                            <div className={`w-16 h-16 ${FEATURE_ICON_BG_CLASS[color] ?? FEATURE_ICON_BG_CLASS.brand} border-[3px] border-ink shadow-[4px_4px_0px_#111827] mb-8 group-hover:scale-110 group-hover:-rotate-6 group-hover:bg-brand-400 transition-all duration-300 flex items-center justify-center`}>
+                                <Icon className="w-8 h-8 text-ink stroke-[3px]" />
                             </div>
-                            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white/[0.04] border border-white/[0.08] text-[10px] uppercase font-bold text-surface-300 tracking-wider mb-4">
+                            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border-2 border-ink text-[10px] uppercase font-black text-ink tracking-widest mb-6 shadow-[2px_2px_0px_#111827]">
                                 🚀 {tag}
                             </div>
-                            <h3 className="text-xl font-bold mb-3 text-white group-hover:text-brand-400 transition-colors">{title}</h3>
-                            <p className="text-sm text-surface-400 leading-relaxed">{description}</p>
+                            <h3 className="text-2xl font-black mb-4 text-ink uppercase tracking-tight leading-none group-hover:underline decoration-4 underline-offset-4">{title}</h3>
+                            <p className="text-base text-ink font-semibold leading-relaxed">{description}</p>
                         </div>
                     ))}
                 </div>
             </section>
 
             {/* ── HOW IT WORKS ── */}
-            <section className="border-y border-white/[0.06] bg-white/[0.015]">
-                <div className="max-w-6xl mx-auto px-4 sm:px-6 py-24">
+            <section className="bg-surface-100 py-24 border-y-2 border-surface-200">
+                <div className="max-w-6xl mx-auto px-4 sm:px-6">
                     <div className="text-center mb-16">
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/[0.04] border border-white/[0.1] text-xs font-semibold text-white mb-4">
-                            <span className="w-1.5 h-1.5 rounded-full bg-brand-400 animate-pulse-soft"></span>
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border-2 border-surface-200 text-xs font-bold text-ink mb-4 shadow-sm">
+                            <span className="w-2 h-2 rounded-full bg-brand-500 animate-pulse"></span>
                             PROSES CEPAT
                         </span>
-                        <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight mb-4">
-                            Tiga Langkah <span className="gradient-text">Mudah</span>
+                        <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight mb-4 text-ink">
+                            Tiga Langkah <span className="text-brand-500">Mudah</span>
                         </h2>
-                        <p className="text-surface-400 max-w-md mx-auto text-sm">
-                            Hanya butuh beberapa menit untuk memulai efisiensi pencarianmu.
+                        <p className="text-surface-600 font-medium max-w-md mx-auto text-base">
+                            Hanya butuh beberapa menit untuk memulai.
                         </p>
                     </div>
 
-                    <div className="grid md:grid-cols-3 gap-8 relative max-w-4xl mx-auto">
+                    <div className="grid md:grid-cols-3 gap-8 relative max-w-5xl mx-auto">
                         {currentHowItWorks.map(({ step, title, description }, i) => (
-                            <div key={step} className="relative text-center group">
-                                {/* Step connector line */}
-                                {i < currentHowItWorks.length - 1 && (
-                                    <div className="hidden md:block absolute top-10 left-[60%] w-[80%] h-px bg-gradient-to-r from-brand-500/30 to-transparent -z-10" />
-                                )}
-
-                                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-brand-500/20 to-brand-500/5 border border-brand-500/30 flex items-center justify-center mx-auto mb-6 group-hover:scale-110 group-hover:border-brand-500/60 transition-all duration-300 shadow-[0_0_30px_rgba(56,189,248,0.1)] group-hover:shadow-[0_0_40px_rgba(56,189,248,0.2)]">
-                                    <span className="text-2xl font-black gradient-text">{step}</span>
+                            <div key={step} className="relative bg-white border-[3px] border-ink p-8 shadow-[6px_6px_0px_#111827] text-left group hover:shadow-[10px_10px_0px_#111827] hover:-translate-y-1 transition-all z-10 flex flex-col">
+                                <div className="w-16 h-16 bg-emerald-300 border-[3px] border-ink shadow-[4px_4px_0px_#111827] flex items-center justify-center mb-6 group-hover:bg-brand-400 group-hover:scale-110 group-hover:-rotate-12 transition-all duration-300">
+                                    <span className="text-2xl font-black text-ink">{step}</span>
                                 </div>
-                                <h3 className="text-lg font-bold mb-3 text-white">{title}</h3>
-                                <p className="text-sm text-surface-400 max-w-[240px] mx-auto leading-relaxed">{description}</p>
+                                <h3 className="text-xl font-black mb-3 text-ink uppercase tracking-tight leading-none group-hover:underline decoration-4 underline-offset-4">{title}</h3>
+                                <p className="text-base text-ink font-semibold leading-relaxed">{description}</p>
                             </div>
                         ))}
                     </div>
@@ -315,19 +329,19 @@ export default function LandingHero() {
                     <div className="text-center mt-20">
                         {audience === 'seeker' ? (
                             <button
-                                onClick={() => openAuthModal('register')}
-                                className="btn-glow group inline-flex items-center gap-2 text-sm px-8 py-4 font-bold"
+                                onClick={() => openAuthModal('register', 'seeker')}
+                                className="inline-flex items-center gap-3 bg-brand-400 border-[3px] border-ink shadow-[6px_6px_0px_#111827] text-ink font-black uppercase text-lg px-10 py-5 transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[4px_4px_0px_#111827] group"
                             >
                                 Mulai Sekarang — Gratis
-                                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                                <ArrowRight className="w-6 h-6 stroke-[3px] group-hover:translate-x-2 transition-transform" />
                             </button>
                         ) : (
                             <button
-                                onClick={() => openAuthModal('register')}
-                                className="btn-glow inline-flex items-center gap-2 text-sm px-8 py-4 font-bold bg-emerald-500 hover:bg-emerald-400 hover:border-emerald-400/50"
+                                onClick={() => openAuthModal('register', 'employer')}
+                                className="inline-flex items-center gap-3 bg-ink text-white border-[3px] border-ink shadow-[6px_6px_0px_#FF90E8] font-black uppercase text-lg px-10 py-5 transition-all hover:bg-surface-800 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[4px_4px_0px_#FF90E8] group"
                             >
                                 Daftar Perusahaan Sekarang
-                                <Building2 className="w-4 h-4 ml-1" />
+                                <Building2 className="w-6 h-6 stroke-[3px] group-hover:scale-110 transition-transform" />
                             </button>
                         )}
                     </div>
@@ -337,20 +351,14 @@ export default function LandingHero() {
             {/* ── TECH STACK BADGES ── */}
             <section className="max-w-6xl mx-auto px-4 sm:px-6 py-16">
                 <div className="text-center mb-8">
-                    <p className="text-[10px] text-surface-500 uppercase tracking-widest font-black">Powered by Industry Leading Tech Stack</p>
+                    <p className="text-xs text-surface-500 uppercase tracking-widest font-black">Powered by Industry Leading Tech Stack</p>
                 </div>
-                <div className="flex flex-wrap items-center justify-center gap-3">
+                <div className="flex flex-wrap items-center justify-center gap-4">
                     {[
-                        { name: 'IndoBERT', glow: 'hover:shadow-blue-500/20' },
-                        { name: 'Google Gemini', glow: 'hover:shadow-purple-500/20' },
-                        { name: 'FastAPI', glow: 'hover:shadow-emerald-500/20' },
-                        { name: 'React 18', glow: 'hover:shadow-cyan-500/20' },
-                        { name: 'PostgreSQL', glow: 'hover:shadow-blue-400/20' },
-                        { name: 'PyTorch', glow: 'hover:shadow-orange-500/20' },
-                        { name: 'Ethereum', glow: 'hover:shadow-zinc-500/20' },
-                        { name: 'pgvector', glow: 'hover:shadow-indigo-500/20' },
-                    ].map(({ name, glow }) => (
-                        <span key={name} className={`px-5 py-2.5 rounded-xl bg-surface-900 border border-white/[0.08] text-xs font-semibold text-surface-300 hover:text-white hover:bg-white/[0.05] transition-all duration-300 shadow-md ${glow}`}>
+                        'IndoBERT', 'Google Gemini', 'FastAPI', 'React 18',
+                        'PostgreSQL', 'PyTorch', 'Redis', 'pgvector'
+                    ].map((name) => (
+                        <span key={name} className="px-5 py-3 bg-surface-50 border-[3px] border-ink shadow-[4px_4px_0px_#111827] text-sm font-black uppercase tracking-widest text-ink hover:bg-brand-200 hover:-translate-y-1 hover:shadow-[6px_6px_0px_#111827] transition-all cursor-default">
                             {name}
                         </span>
                     ))}
