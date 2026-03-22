@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import logging
 
-from sqlalchemy import event
+from sqlalchemy import event, inspect, text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase
 
@@ -91,8 +91,30 @@ async def get_session():
             await session.close()
 
 
+def _get_table_columns(sync_conn, table_name: str) -> set[str]:
+    """Return the set of column names for a table if it exists."""
+    inspector = inspect(sync_conn)
+    if table_name not in inspector.get_table_names():
+        return set()
+    return {column["name"] for column in inspector.get_columns(table_name)}
+
+
+async def _migrate_verification_logs_schema(conn) -> None:
+    """Rename the legacy verification column to the generic hash name."""
+    column_names = await conn.run_sync(_get_table_columns, "verification_logs")
+    if "zk_commitment" in column_names and "verification_hash" not in column_names:
+        await conn.execute(
+            text(
+                "ALTER TABLE verification_logs "
+                "RENAME COLUMN zk_commitment TO verification_hash"
+            )
+        )
+        logger.info("Migrated verification_logs.zk_commitment to verification_hash")
+
+
 async def init_db() -> None:
     """Create all tables. Called once during application startup."""
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+        await _migrate_verification_logs_schema(conn)
     logger.info("✅ Database tables created / verified")
