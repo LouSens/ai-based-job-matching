@@ -7,11 +7,15 @@ ANTIGRAVITY PROTOCOL: All API changes require test updates.
 """
 from __future__ import annotations
 
+from pathlib import Path
+
 import pytest
 from fastapi.testclient import TestClient
+from sqlalchemy import inspect, text
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.schema import CreateTable
 
+from src.api import database as database_module
 from src.api.main import app
 from src.api.models import JobPosting, SeekerProfile
 from src.api.schemas.auth import UserLoginRequest, UserRegisterRequest
@@ -266,6 +270,92 @@ class TestStartupConfiguration:
         with pytest.raises(RuntimeError, match="JWT_SECRET_KEY must be set"):
             async with app.router.lifespan_context(app):
                 pass
+
+    @pytest.mark.asyncio
+    async def test_init_db_renames_legacy_verification_column(self, tmp_path: Path) -> None:
+        """init_db should rename the legacy verification column without data loss."""
+        database_url = f"sqlite+aiosqlite:///{(tmp_path / 'legacy_verification.db').as_posix()}"
+        database_module.reconfigure(database_url)
+
+        try:
+            async with database_module.engine.begin() as conn:
+                await conn.execute(
+                    text(
+                        """
+                        CREATE TABLE verification_logs (
+                            id VARCHAR(36) PRIMARY KEY,
+                            user_id VARCHAR(36),
+                            verification_type VARCHAR(20),
+                            status VARCHAR(20),
+                            zk_commitment VARCHAR(64),
+                            match_score FLOAT,
+                            verified_at DATETIME
+                        )
+                        """
+                    )
+                )
+                await conn.execute(
+                    text(
+                        """
+                        INSERT INTO verification_logs
+                            (id, user_id, verification_type, status, zk_commitment, match_score, verified_at)
+                        VALUES
+                            ('log-1', 'user-1', 'ekyc', 'VERIFIED', 'hash-123', 98.5, '2026-03-22T00:00:00Z')
+                        """
+                    )
+                )
+
+            await database_module.init_db()
+
+            async with database_module.engine.begin() as conn:
+                column_names = await conn.run_sync(
+                    lambda sync_conn: {column["name"] for column in inspect(sync_conn).get_columns("verification_logs")}
+                )
+                verification_hash = (
+                    await conn.execute(text("SELECT verification_hash FROM verification_logs WHERE id = 'log-1'"))
+                ).scalar_one()
+
+            assert "verification_hash" in column_names
+            assert "zk_commitment" not in column_names
+            assert verification_hash == "hash-123"
+        finally:
+            database_module.reconfigure("sqlite+aiosqlite:///./kerjacerdas.db")
+
+    @pytest.mark.asyncio
+    async def test_init_db_leaves_current_verification_column_unchanged(self, tmp_path: Path) -> None:
+        """init_db should keep the current verification column name unchanged."""
+        database_url = f"sqlite+aiosqlite:///{(tmp_path / 'current_verification.db').as_posix()}"
+        database_module.reconfigure(database_url)
+
+        try:
+            async with database_module.engine.begin() as conn:
+                await conn.execute(
+                    text(
+                        """
+                        CREATE TABLE verification_logs (
+                            id VARCHAR(36) PRIMARY KEY,
+                            user_id VARCHAR(36),
+                            verification_type VARCHAR(20),
+                            status VARCHAR(20),
+                            verification_hash VARCHAR(64),
+                            match_score FLOAT,
+                            verified_at DATETIME
+                        )
+                        """
+                    )
+                )
+
+            await database_module.init_db()
+
+            async with database_module.engine.begin() as conn:
+                column_names = await conn.run_sync(
+                    lambda sync_conn: {column["name"] for column in inspect(sync_conn).get_columns("verification_logs")}
+                )
+
+            assert "verification_hash" in column_names
+            assert "zk_commitment" not in column_names
+        finally:
+            database_module.reconfigure("sqlite+aiosqlite:///./kerjacerdas.db")
 
 
 class TestBackendCompatibility:
